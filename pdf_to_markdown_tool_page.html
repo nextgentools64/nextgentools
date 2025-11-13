@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <!-- Primary SEO -->
+  <title>PDF to Markdown — Convert PDFs into clean Markdown (.md)</title>
+  <meta name="description" content="Convert PDF files to clean, editable Markdown. Preserves headings, lists and tables. Fast, SEO-friendly tool for docs, notes and GitHub READMEs.">
+  <meta name="keywords" content="PDF to Markdown, PDF convert, markdown converter, PDF converter, documentation tools">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="PDF to Markdown — Convert PDFs into clean Markdown (.md)">
+  <meta property="og:description" content="Convert PDF files to clean, editable Markdown. Preserves headings, lists and tables.">
+  <meta property="og:image" content="/assets/og-pdf-to-markdown.png">
+  <meta property="og:url" content="https://storedropship.in/tools/pdf-to-markdown/">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PDF to Markdown — Convert PDFs into clean Markdown (.md)">
+  <meta name="twitter:description" content="Convert PDF files to clean, editable Markdown. Preserves headings, lists and tables.">
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "PDF to Markdown",
+    "description": "Converts PDF files into clean, editable Markdown format while preserving headings, lists and tables.",
+    "url": "https://storedropship.in/tools/pdf-to-markdown/",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "All",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" }
+  }
+  </script>
+
+  <style>
+    :root{--accent:#0b79d0;--muted:#666}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;line-height:1.5;margin:0;color:#111}
+    .container{max-width:980px;margin:0 auto;padding:28px}
+    header{display:flex;justify-content:space-between;align-items:center;padding:16px 0}
+    header a.logo{font-weight:700;color:var(--accent);text-decoration:none;font-size:20px}
+    nav a{margin-left:14px;text-decoration:none;color:var(--muted)}
+    .hero{display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:center;margin-top:10px}
+    .card{background:#fff;border:1px solid #eee;padding:18px;border-radius:10px;box-shadow:0 6px 18px rgba(15,15,15,0.03)}
+    h1{margin:0 0 8px;font-size:28px}
+    p.lead{margin:0;color:var(--muted)}
+    ul.features{list-style:disc;margin:14px 0 0;padding-left:20px;color:var(--muted)}
+    .upload-box{display:flex;flex-direction:column;gap:10px}
+    input[type=file]{padding:8px}
+    button.primary{background:var(--accent);color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer}
+    .small{font-size:13px;color:var(--muted)}
+    .example-output{white-space:pre-wrap;background:#f7f9fc;padding:12px;border-radius:8px;border:1px dashed #e2e8f0}
+    footer{margin-top:30px;padding:18px 0;border-top:1px solid #eee;color:var(--muted)}
+    .contact{display:flex;gap:12px;align-items:center}
+    .meta-row{display:flex;gap:12px;flex-wrap:wrap;font-size:13px}
+    @media(max-width:880px){.hero{grid-template-columns:1fr;}.container{padding:18px}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a class="logo" href="/">storedropship.in</a>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/tools/">Tools</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <div class="card">
+            <h1>PDF to Markdown</h1>
+            <p class="lead">Upload a PDF and get a clean, editable Markdown (.md) file. Headings, bullet lists and tables are preserved where possible.</p>
+
+            <h3 style="margin-top:16px">How it works</h3>
+            <ol class="small">
+              <li>Text and layout are extracted from the PDF.</li>
+              <li>Headings are detected and converted to `#` / `##` style Markdown.</li>
+              <li>Lists and simple tables are converted to `-` lists and pipe tables.</li>
+            </ol>
+
+            <h3 style="margin-top:12px">Key Features</h3>
+            <ul class="features">
+              <li>Preserves headings, lists and basic tables</li>
+              <li>Produces GitHub-friendly Markdown</li>
+              <li>Downloadable `.md` output</li>
+            </ul>
+
+            <h3 style="margin-top:14px">Use-cases</h3>
+            <p class="small">Documentation authors, students, and developers converting PDFs for GitHub, Notion, or static sites.</p>
+          </div>
+
+          <div style="margin-top:14px" class="card">
+            <h3>Example output</h3>
+            <div class="example-output"># Title of Document
+
+This is a paragraph extracted from the PDF.
+
+## Section heading
+
+- Bullet item 1
+- Bullet item 2
+
+| Column A | Column B |
+|---|---|
+| Row 1A | Row 1B |
+</div>
+          </div>
+        </div>
+
+        <aside>
+          <div class="card upload-box">
+            <h3>Upload PDF</h3>
+            <!-- NOTE: The form below is a placeholder. Implement a backend route /api/convert that accepts multipart/form-data and returns the converted .md file. -->
+            <form id="convertForm" method="POST" enctype="multipart/form-data" action="/api/convert">
+              <input type="file" id="pdfFile" name="pdf" accept="application/pdf" required>
+              <label class="small"><input type="checkbox" id="preserveImages" name="preserveImages"> Try to extract and link images</label>
+              <div style="display:flex;gap:8px;margin-top:6px">
+                <button type="submit" class="primary">Convert to Markdown</button>
+                <button type="button" id="downloadSample">Download Sample .md</button>
+              </div>
+              <p class="small">Accepted: PDF files up to 20MB (server-dependent). Conversion may vary for scanned PDFs — OCR required for image-only pages.</p>
+            </form>
+
+            <hr>
+            <div class="small">
+              <strong>Contact</strong>
+              <div class="meta-row">
+                <span>WhatsApp: +91 9258036351</span>
+                <span>Email: <a href="mailto:contact@storedropship.in">contact@storedropship.in</a></span>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px" class="card">
+            <h4>Notes for implementation</h4>
+            <ul class="small">
+              <li>Server-side: Use `pdfminer.six` (Python) or `pdf.js` (Node) to extract text; then map text blocks to Markdown.</li>
+              <li>For scanned PDFs, add OCR (Tesseract) before parsing.</li>
+              <li>Tables: try `camelot` or `tabula` on server-side to extract accurate tables.</li>
+              <li>Client-side fallback: use `pdf.js` to render pages and extract text if no server component available.</li>
+            </ul>
+          </div>
+        </aside>
+      </section>
+
+      <section style="margin-top:20px" class="card">
+        <h3>SEO & Sharing</h3>
+        <p class="small">This page includes meta tags for Open Graph and Twitter. For better discoverability, add an FAQ section and structured examples of file types converted.</p>
+      </section>
+
+      <section style="margin-top:18px" class="card">
+        <h3>Contact & Feedback</h3>
+        <p class="small">If you need a custom integration (bulk jobs, private instance, or WordPress plugin), contact us using the form below.</p>
+        <form id="contactForm" method="POST" action="/contact/submit">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input name="name" placeholder="Your name" required style="flex:1;padding:10px;border:1px solid #e6eef8;border-radius:8px">
+            <input name="email" placeholder="Email" type="email" required style="flex:1;padding:10px;border:1px solid #e6eef8;border-radius:8px">
+          </div>
+          <textarea name="message" placeholder="How can we help?" rows="4" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;border:1px solid #e6eef8"></textarea>
+          <div style="display:flex;justify-content:flex-end;margin-top:8px">
+            <button class="primary" type="submit">Send message</button>
+          </div>
+        </form>
+      </section>
+
+    </main>
+
+    <footer>
+      <div class="meta-row">
+        <div>© "Saumic Craft" / storedropship.in</div>
+        <div class="contact">Contact: <a href="https://wa.me/919258036351">+91 9258036351</a> | <a href="mailto:contact@storedropship.in">contact@storedropship.in</a></div>
+      </div>
+      <div style="margin-top:8px" class="small">Privacy · Terms · Sitemap</div>
+    </footer>
+  </div>
+
+  <script>
+    // Sample client-side behaviour: download a sample .md file
+    document.getElementById('downloadSample').addEventListener('click', function(){
+      const sample = `# Sample Document\n\nThis is a sample Markdown output generated by PDF to Markdown.\n\n## Section\n\n- Item 1\n- Item 2\n\n| A | B |\n|---|---|\n| 1 | 2 |`;
+      const blob = new Blob([sample], {type: 'text/markdown'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'sample.md'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    // Conversion form: this is a placeholder. Server must respond with the .md file.
+    document.getElementById('convertForm').addEventListener('submit', function(e){
+      // keep default form submission (POST to /api/convert) so server can return a file response.
+      // If you want client-side conversion, replace this with fetch + pdf.js parsing logic.
+    });
+  </script>
+</body>
+</html>

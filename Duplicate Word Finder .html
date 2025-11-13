@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Duplicate Word Finder | Free Online Text Tool - StoreDropShip</title>
+<meta name="description" content="Duplicate Word Finder helps you detect and highlight repeated words instantly. Free online text tool for writers and bloggers.">
+
+<style>
+  :root{
+    --bg:#f7f7fb; --fg:#0f172a; --muted:#64748b; --card:#ffffff; --border:#e5e7eb;
+    --dup:#fde68a;           /* default duplicate color (2x) */
+    --trip:#93c5fd;          /* default triple+ color (3x+) */
+    --focus-text:#111827;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root{
+      --bg:#0b0b0e; --fg:#e5e7eb; --muted:#94a3b8; --card:#121216; --border:#1f2937;
+      /* keep defaults for dark, but can be overridden by pickers */
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue","Noto Sans",Arial}
+  header{position:sticky;top:0;z-index:5;background:color-mix(in oklab, var(--card) 80%, transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+  .wrap{max-width:1100px;margin:auto;padding:16px}
+  h1{margin:0;font-size:20px;font-weight:700}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .btn{border:1px solid var(--border);background:var(--card);color:var(--fg);padding:.5rem .8rem;border-radius:12px;font-size:14px;cursor:pointer}
+  .btn:hover{filter:brightness(1.05)}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px}
+  .controls{padding:12px;display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+  .controls .small{font-size:13px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px;padding:16px}
+  @media(min-width:900px){ .grid{grid-template-columns:2fr 1fr} }
+  .editor{position:relative;min-height:440px;border-radius:16px;overflow:hidden}
+  .high, textarea{
+    font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    padding:12px; white-space:pre-wrap; word-break:break-word;
+  }
+  .high{position:absolute;inset:0;pointer-events:none;overflow:auto}
+  .high .dup{background:var(--dup);color:var(--focus-text);border-radius:4px;padding:0 .15rem}
+  .high .trip{background:var(--trip);color:var(--focus-text);border-radius:4px;padding:0 .15rem}
+  textarea{position:relative;z-index:2;width:100%;height:100%;min-height:440px;resize:none;border:0;outline:none;background:transparent;color:var(--fg);caret-color:currentColor;overflow:auto}
+  .sidebar{padding:12px}
+  .muted{color:var(--muted);font-size:14px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .badge{display:inline-flex;align-items:center;gap:.5ch;padding:.25rem .6rem;border:1px solid var(--border);border-radius:999px;background:var(--card);color:var(--fg);font-size:13px}
+  .badge.focus{outline:2px solid var(--dup)}
+  .nums{margin-left:auto;font-size:12px;color:var(--muted)}
+  .hidden{display:none}
+  label.switch{display:flex;align-items:center;gap:8px;font-size:14px}
+  input[type="range"]{accent-color:#3b82f6}
+  .hint{font-size:12px;color:var(--muted)}
+  /* color-picker row */
+  .color-row{display:flex;gap:10px;align-items:center}
+  .color-row label{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+  .color-swatch{display:inline-block;width:28px;height:28px;border-radius:6px;border:1px solid var(--border)}
+</style>
+</head>
+<body>
+  <header>
+    <div class="wrap row" style="justify-content:space-between;align-items:center">
+      <div>
+        <h1>Duplicate Word Finder</h1>
+        <p style="margin:.25rem 0 0">Our Duplicate Word Finder helps you find and highlight repeated words in your text instantly.</p>
+      </div>
+      <div class="nums" id="counts">0 words · 0 characters</div>
+    </div>
+  </header>
+
+  <div class="wrap card controls">
+    <div>
+      <div class="small">Min length</div>
+      <input id="minLen" type="range" min="1" max="12" value="4">
+      <span id="minLenVal" class="small">4</span>
+    </div>
+    <div>
+      <div class="small">Min repeats</div>
+      <input id="minRep" type="range" min="2" max="10" value="2">
+      <span id="minRepVal" class="small">2</span>
+    </div>
+
+    <label class="switch">
+      <input id="caseSensitive" type="checkbox"> Case sensitive
+    </label>
+    <label class="switch">
+      <input id="mergeHashtag" type="checkbox"> Treat <code>#word</code> same as <code>word</code>
+    </label>
+
+    <!-- Color pickers: Duplicate (2x) and Triple+ (3x+) -->
+    <div class="color-row" style="margin-left:8px">
+      <label>
+        Duplicate (2x)
+        <div style="display:flex;align-items:center;gap:8px">
+          <input id="dupColor" type="color" value="#fde68a" aria-label="Duplicate color picker">
+          <span id="dupHex" class="small" style="min-width:64px">#fde68a</span>
+        </div>
+      </label>
+
+      <label>
+        Triple+ (3x+)
+        <div style="display:flex;align-items:center;gap:8px">
+          <input id="tripColor" type="color" value="#93c5fd" aria-label="Triple color picker">
+          <span id="tripHex" class="small" style="min-width:64px">#93c5fd</span>
+        </div>
+      </label>
+    </div>
+
+    <div class="row" style="margin-left:auto">
+      <button class="btn" id="copyBtn">Copy</button>
+      <button class="btn" id="clearBtn">Clear</button>
+      <button class="btn" id="downloadBtn">Download</button>
+      <label class="btn" style="cursor:pointer">Upload
+        <input id="uploadInp" class="hidden" type="file" accept=".txt" />
+      </label>
+    </div>
+
+    <div class="hint">Tip: agar highlight nahi dikh raha, sliders check karein — chhote words ke liye “Min length” ghataiye.</div>
+  </div>
+
+  <div class="wrap grid">
+    <div class="card editor">
+      <div class="high" id="high"></div>
+      <textarea id="ta" placeholder="Paste or type your text here…"></textarea>
+    </div>
+
+    <aside class="card sidebar">
+      <div class="small" style="font-weight:600;margin-bottom:8px">Duplicates</div>
+      <div id="nodup" class="muted">No duplicates found with current filters.</div>
+      <div class="chips" id="chips"></div>
+    </aside>
+  </div>
+
+<script>
+(() => {
+  const WORD_RE = /#?[\p{L}\p{N}_]+/gu;
+  const $ = s => document.querySelector(s);
+  const ta=$("#ta"), high=$("#high"), chips=$("#chips"),
+        minLen=$("#minLen"),minRep=$("#minRep"),
+        minLenVal=$("#minLenVal"),minRepVal=$("#minRepVal"),
+        caseSensitive=$("#caseSensitive"),mergeHashtag=$("#mergeHashtag"),
+        countsEl=$("#counts"),nodup=$("#nodup"),
+        copyBtn=$("#copyBtn"),clearBtn=$("#clearBtn"),
+        downloadBtn=$("#downloadBtn"),uploadInp=$("#uploadInp"),
+        dupColorInp=$("#dupColor"), tripColorInp=$("#tripColor"),
+        dupHex=$("#dupHex"), tripHex=$("#tripHex");
+
+  const LS=k=>"dwf_"+k;
+
+  // restore settings (including colors)
+  try{
+    minLen.value=+localStorage.getItem(LS("minLen"))||4;
+    minRep.value=+localStorage.getItem(LS("minRep"))||2;
+    caseSensitive.checked=localStorage.getItem(LS("case"))==="1";
+    mergeHashtag.checked=localStorage.getItem(LS("mergeHash"))==="1";
+    ta.value=localStorage.getItem(LS("text"))||"";
+
+    const savedDup = localStorage.getItem(LS("dupColor"));
+    const savedTrip = localStorage.getItem(LS("tripColor"));
+    if(savedDup) { dupColorInp.value = savedDup; dupHex.textContent = savedDup; document.documentElement.style.setProperty('--dup', savedDup); }
+    if(savedTrip) { tripColorInp.value = savedTrip; tripHex.textContent = savedTrip; document.documentElement.style.setProperty('--trip', savedTrip); }
+  }catch(e){ console.warn("restore failed", e); }
+
+  function normalizeKey(raw,cs,mergeHash){
+    let key=cs?raw:raw.toLocaleLowerCase();
+    if(mergeHash&&key.startsWith("#")) key=key.slice(1);
+    return key;
+  }
+
+  function tokenize(text,cs,mergeHash){
+    const tokens=[]; let m; WORD_RE.lastIndex=0;
+    while((m=WORD_RE.exec(text))!==null){
+      const raw=m[0]; const key=normalizeKey(raw,cs,mergeHash);
+      tokens.push({raw,key,start:m.index,end:m.index+raw.length});
+    }
+    return tokens;
+  }
+
+  function analyze(text,st){
+    const tokens=tokenize(text,st.caseSensitive,st.mergeHashtag);
+    const counts=new Map();
+    for(const t of tokens) counts.set(t.key,(counts.get(t.key)||0)+1);
+    const dup=[];
+    counts.forEach((cnt,key)=>{
+      const sample=tokens.find(t=>t.key===key)?.raw||key;
+      if(sample.length>=st.minLen && cnt>=st.minRep) dup.push({key,display:sample,cnt});
+    });
+    dup.sort((a,b)=>b.cnt-a.cnt||a.display.localeCompare(b.display));
+    return {tokens,dup};
+  }
+
+  function render(text,st,focusKeys){
+    const {tokens,dup}=analyze(text,st);
+    const words=tokenize(text,true,st.mergeHashtag).length;
+    countsEl.textContent=`${words} words · ${text.length} characters`;
+    chips.innerHTML="";
+    nodup.style.display=dup.length?"none":"block";
+    dup.forEach(d=>{
+      const b=document.createElement("button");
+      b.className="badge"+(focusKeys.has(d.key)?" focus":"");
+      b.innerHTML=`<strong style="margin-right:.35rem">${d.cnt}</strong> ${d.display}`;
+      b.addEventListener("click",()=>{ focusKeys.has(d.key)?focusKeys.delete(d.key):focusKeys.add(d.key); render(text,st,focusKeys); });
+      chips.appendChild(b);
+    });
+
+    const dupMap=new Map(dup.map(d=>[d.key,d.cnt]));
+    let cursor=0,html="";
+    for(const t of tokens){
+      if(cursor<t.start) html += escapeHTML(text.slice(cursor,t.start));
+      const cnt = dupMap.get(t.key) || 0;
+      const isDup = cnt >= 2;
+      const isFocus = focusKeys.size ? focusKeys.has(t.key) : isDup;
+      const chunk = escapeHTML(text.slice(t.start,t.end));
+      if(isDup && isFocus){
+        const cls = cnt >= 3 ? "trip" : "dup";
+        html += `<span class="${cls}">${chunk}</span>`;
+      } else html += chunk;
+      cursor = t.end;
+    }
+    if(cursor < text.length) html += escapeHTML(text.slice(cursor));
+    high.innerHTML = html;
+  }
+
+  const escapeHTML = s => s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const st = ()=>({minLen:+minLen.value,minRep:+minRep.value,caseSensitive:caseSensitive.checked,mergeHashtag:mergeHashtag.checked});
+  const focusKeys = new Set();
+  const refresh = ()=> render(ta.value, st(), focusKeys);
+
+  // UI events
+  ["input","keyup","change"].forEach(ev=>ta.addEventListener(ev,()=>{ try{ localStorage.setItem(LS("text"), ta.value); }catch(e){} refresh(); }));
+  minLen.addEventListener("input", ()=> { minLenVal.textContent = minLen.value; try{localStorage.setItem(LS("minLen"), minLen.value);}catch(e){} refresh(); });
+  minRep.addEventListener("input", ()=> { minRepVal.textContent = minRep.value; try{localStorage.setItem(LS("minRep"), minRep.value);}catch(e){} refresh(); });
+  caseSensitive.addEventListener("change", ()=> { try{localStorage.setItem(LS("case"), caseSensitive.checked ? "1":"0"); }catch(e){} refresh(); });
+  mergeHashtag.addEventListener("change", ()=> { try{localStorage.setItem(LS("mergeHash"), mergeHashtag.checked ? "1":"0"); }catch(e){} refresh(); });
+
+  // color pickers
+  function setDupColor(hex){
+    document.documentElement.style.setProperty('--dup', hex);
+    dupHex.textContent = hex;
+    try{ localStorage.setItem(LS("dupColor"), hex); }catch(e){}
+  }
+  function setTripColor(hex){
+    document.documentElement.style.setProperty('--trip', hex);
+    tripHex.textContent = hex;
+    try{ localStorage.setItem(LS("tripColor"), hex); }catch(e){}
+  }
+  dupColorInp.addEventListener("input", e => { setDupColor(e.target.value); refresh(); });
+  tripColorInp.addEventListener("input", e => { setTripColor(e.target.value); refresh(); });
+
+  // copy/clear/download/upload
+  copyBtn.addEventListener("click", async () => {
+    const text = ta.value || "";
+    if(!text){ alert("No text to copy"); return; }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      try{ await navigator.clipboard.writeText(text); copyBtn.textContent = "Copied!"; setTimeout(()=>copyBtn.textContent="Copy",1200); return; }catch(e){ console.warn("clipboard failed", e); }
+    }
+    // fallback
+    ta.select();
+    try{ document.execCommand('copy'); copyBtn.textContent="Copied!"; setTimeout(()=>copyBtn.textContent="Copy",1200); }catch(e){ alert("Copy failed — please select and copy manually."); } finally { window.getSelection().removeAllRanges(); }
+  });
+  clearBtn.addEventListener("click", ()=> { ta.value=""; try{localStorage.setItem(LS("text"), "");}catch(e){} refresh(); });
+  downloadBtn.addEventListener("click", ()=> { const blob=new Blob([ta.value],{type:"text/plain;charset=utf-8"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="text.txt"; a.click(); URL.revokeObjectURL(url); });
+  uploadInp.addEventListener("change", e => { const f=e.target.files?.[0]; if(!f) return; const r=new FileReader(); r.onload = ()=> { ta.value = String(r.result || ""); try{localStorage.setItem(LS("text"), ta.value);}catch(e){} refresh(); }; r.readAsText(f); });
+
+  // init
+  minLenVal.textContent = minLen.value; minRepVal.textContent = minRep.value;
+  // ensure CSS vars reflect initial inputs (if not from localStorage)
+  setDupColor(dupColorInp.value);
+  setTripColor(tripColorInp.value);
+  refresh();
+})();
+</script>
+</body>
+</html>

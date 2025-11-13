@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CSV to Excel Converter — Storedropship Tool</title>
+<meta name="description" content="Convert CSV files to Excel (.xlsx) format online. Import CSV, preview data, and download as Excel file. Copy, validate, and offline-ready." />
+<meta name="keywords" content="CSV to Excel, convert CSV to XLSX, online CSV converter, Excel export, CSV editor" />
+<style>
+:root{--bg:#f9fafb;--card:#fff;--muted:#6b7280;--accent:#0ea5a4}
+*{box-sizing:border-box;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif}
+body{margin:0;padding:20px;background:linear-gradient(180deg,var(--bg),#eef2ff);color:#111827}
+.wrap{max-width:960px;margin:0 auto}
+.card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.05);margin-bottom:14px}
+h1{margin-bottom:6px;font-size:20px}
+p.lead{margin:0 0 12px;color:var(--muted)}
+textarea,input{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef6;font-size:14px;margin-top:8px;resize:vertical}
+.controls{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+button.primary{background:var(--accent);color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer}
+button.alt{background:#fff;border:1px solid #e6eef6;color:#0b5394;padding:10px;border-radius:8px}
+.meta{font-size:13px;color:var(--muted);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card">
+<h1>CSV to Excel Converter</h1>
+<p class="lead">Convert your CSV data into Excel (.xlsx) files online. Preview your data, make adjustments if needed, and download as a fully compatible Excel spreadsheet.</p>
+<label for="csvInput">CSV Input</label>
+<textarea id="csvInput" placeholder="Paste your CSV data here or load file..."></textarea>
+<input type="file" id="fileInput" accept=".csv" style="margin-top:8px" />
+<div class="controls">
+<button class="primary" id="convertBtn">Convert to Excel</button>
+<button class="alt" id="copyBtn">Copy CSV</button>
+<button class="alt" id="downloadBtn">Download Excel</button>
+<button class="alt" id="clearBtn">Clear</button>
+</div>
+<div class="meta">Tip: CSV must include headers. Use UTF-8 encoding for special characters.</div>
+</div>
+<div class="card">
+<h2>Description</h2>
+<p style="margin:0;color:#374151;line-height:1.6">This CSV to Excel converter is a browser-based tool to help convert CSV files to Excel format quickly. Features include:</p>
+<ul style="margin-top:6px;color:#374151">
+<li>Import CSV directly or paste CSV text.</li>
+<li>Preview CSV content before conversion.</li>
+<li>Download as Excel (.xlsx) with proper formatting.</li>
+<li>Lightweight, fast, and works offline.</li>
+</ul>
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const csvInput=document.getElementById('csvInput');
+const fileInput=document.getElementById('fileInput');
+const convertBtn=document.getElementById('convertBtn');
+const copyBtn=document.getElementById('copyBtn');
+const downloadBtn=document.getElementById('downloadBtn');
+const clearBtn=document.getElementById('clearBtn');
+let csvData='';
+
+fileInput.addEventListener('change',e=>{
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{csvData=ev.target.result; csvInput.value=csvData;};
+  reader.readAsText(file);
+});
+
+convertBtn.addEventListener('click',()=>{
+  csvData=csvInput.value;
+  if(!csvData)return alert('No CSV data found');
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.csv_to_sheet(csvData);
+  XLSX.utils.book_append_sheet(wb,ws,'Sheet1');
+  XLSX.writeFile(wb,'converted.xlsx');
+});
+
+copyBtn.addEventListener('click',async()=>{
+  try{await navigator.clipboard.writeText(csvInput.value);alert('CSV copied!');}catch(e){alert('Copy failed');}
+});
+
+downloadBtn.addEventListener('click',()=>{
+  if(!csvData)return alert('No CSV data to download');
+  const blob=new Blob([csvData],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='data.csv'; a.click(); URL.revokeObjectURL(url);
+});
+
+clearBtn.addEventListener('click',()=>{csvInput.value='';csvData='';fileInput.value='';});
+</script>
+</body>
+</html>

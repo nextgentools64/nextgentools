@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lorem Ipsum Generator — Storedropship</title>
+  <meta name="description" content="Generate placeholder text instantly. Options for paragraphs, sentences, words, HTML tags, custom seed text, and different filler styles. Offline-ready and copy-paste-ready." />
+  <meta name="keywords" content="Lorem Ipsum, placeholder text, dummy text generator, lipsum, generate lorem" />
+  <style>
+    :root{--bg:#fbfdff;--card:#fff;--muted:#6b7280;--accent:#0ea5a4}
+    *{box-sizing:border-box;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif}
+    body{margin:0;background:linear-gradient(180deg,var(--bg),#eef6ff);padding:18px;color:#071124}
+    .wrap{max-width:960px;margin:0 auto}
+    .card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 10px 30px rgba(10,20,40,0.06);margin-bottom:14px}
+    h1{margin:0 0 6px;font-size:20px}
+    p.lead{margin:0 0 12px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    label{font-size:13px;color:#374151}
+    input,select,textarea,button{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef6;font-size:14px}
+    .controls{display:flex;gap:8px;margin-top:10px}
+    button.primary{background:var(--accent);color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer}
+    button.alt{background:#fff;border:1px solid #e6eef6;color:#0b5394;padding:10px;border-radius:8px}
+    pre{background:#f8fafc;padding:12px;border-radius:8px;border:1px solid #e6e9ef;overflow:auto;max-height:420px}
+    .meta{font-size:13px;color:var(--muted);margin-top:8px}
+    .small{font-size:13px;color:var(--muted)}
+    @media(max-width:800px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Lorem Ipsum Generator</h1>
+      <p class="lead">Generate placeholder (dummy) text for layouts, mockups, and content testing. Choose paragraphs, sentences or words, add HTML tags, use a custom seed or classic Lorem Ipsum, and download or copy the result.</p>
+
+      <div class="grid">
+        <div>
+          <label for="mode">Mode</label>
+          <select id="mode">
+            <option value="paragraphs">Paragraphs</option>
+            <option value="sentences">Sentences</option>
+            <option value="words">Words</option>
+          </select>
+
+          <label for="amount" style="margin-top:8px">Amount</label>
+          <input id="amount" type="number" value="3" min="1" />
+
+          <label for="style" style="margin-top:8px">Style</label>
+          <select id="style">
+            <option value="classic">Classic Lorem Ipsum</option>
+            <option value="hipster">Hipster Ipsum</option>
+            <option value="corporate">Corporate Ipsum</option>
+            <option value="custom">Custom seed text</option>
+          </select>
+
+          <label for="seed" style="margin-top:8px">Custom seed text (comma-separated words)</label>
+          <input id="seed" placeholder="e.g. design,cloud,performance,ux" />
+
+          <div style="margin-top:8px">
+            <label><input type="checkbox" id="includeHtml" /> Include basic HTML tags (&lt;p&gt;, &lt;strong&gt;, &lt;em&gt;)</label>
+          </div>
+
+          <div class="controls">
+            <button class="primary" id="generate">Generate</button>
+            <button class="alt" id="copy">Copy</button>
+            <button class="alt" id="download">Download .txt</button>
+            <button class="alt" id="downloadHtml">Download .html</button>
+          </div>
+
+          <div class="meta">Tip: Choose 'custom' style and enter words to generate brand-specific placeholder content. Use HTML download for direct embedding into mock pages.</div>
+        </div>
+
+        <div>
+          <label>Preview / Output</label>
+          <pre id="output">No text generated yet. Click Generate to create lorem ipsum.</pre>
+          <div class="small" style="margin-top:8px">Click any word in the preview to copy it. Use the copy button to copy full output.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 8px">Description</h2>
+      <p style="margin:0;color:#374151;line-height:1.6">This Lorem Ipsum Generator provides flexible placeholder text generation for designers, developers and content creators. It supports classic Lorem Ipsum and alternative 'flavours' for more relevant mock content. The tool runs fully in the browser and includes copy, download (text & HTML), and simple customization via seed words or API hooks for server-generated content.</p>
+      <ul style="margin-top:8px;color:#374151">
+        <li>Modes: paragraphs, sentences, or words.</li>
+        <li>Styles: classic, hipster, corporate, or custom seed words.</li>
+        <li>Include simple HTML tags for quick embedding.</li>
+        <li>Offline-ready and easy to extend; add more styles or server-side endpoints as needed.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Word banks
+    const classic = `lorem,ipsum,dolor,sit,amet,consectetur,adipiscing,elit,sed,do,eiusmod,tempor,incididunt,ut,labore,et,dolore,magna,aliqua`.split(',');
+    const hipster = `banjo,aesthetic,kitsch,artisan,palo,alto,fixie,vinyl,locavore,umami,craft,beer,indie,small-batch,bespoke`.split(',');
+    const corporate = `synergy,leverage,platform,scalable,bandwidth,paradigm,streamline,stakeholder,deliverable,ROI,benchmark,ecosystem`.split(',');
+
+    const modeEl = document.getElementById('mode');
+    const amountEl = document.getElementById('amount');
+    const styleEl = document.getElementById('style');
+    const seedEl = document.getElementById('seed');
+    const includeHtmlEl = document.getElementById('includeHtml');
+    const outputEl = document.getElementById('output');
+    const generateBtn = document.getElementById('generate');
+    const copyBtn = document.getElementById('copy');
+    const downloadBtn = document.getElementById('download');
+    const downloadHtmlBtn = document.getElementById('downloadHtml');
+
+    function chooseWords(style){
+      if(style === 'classic') return classic;
+      if(style === 'hipster') return hipster;
+      if(style === 'corporate') return corporate;
+      if(style === 'custom'){
+        const raw = seedEl.value.trim();
+        if(!raw) return classic;
+        return raw.split(',').map(s=>s.trim()).filter(Boolean);
+      }
+      return classic;
+    }
+
+    function sentenceFromWords(words, wordCount=12){
+      const out = [];
+      for(let i=0;i<wordCount;i++){
+        const w = words[Math.floor(Math.random()*words.length)];
+        out.push(w);
+      }
+      let s = out.join(' ');
+      s = s.charAt(0).toUpperCase() + s.slice(1) + '.';
+      return s;
+    }
+
+    function paragraphFromWords(words, sentenceCount=5){
+      const s = [];
+      for(let i=0;i<sentenceCount;i++) s.push(sentenceFromWords(words, 8 + Math.floor(Math.random()*8)));
+      return s.join(' ');
+    }
+
+    function generate(){
+      const mode = modeEl.value;
+      const amt = Math.max(1, parseInt(amountEl.value,10) || 1);
+      const style = styleEl.value;
+      const words = chooseWords(style);
+      const useHtml = includeHtmlEl.checked;
+      let result = '';
+
+      if(mode === 'words'){
+        const arr = [];
+        for(let i=0;i<amt;i++) arr.push(words[Math.floor(Math.random()*words.length)]);
+        result = arr.join(' ');
+      } else if(mode === 'sentences'){
+        const arr = [];
+        for(let i=0;i<amt;i++) arr.push(sentenceFromWords(words, 6 + Math.floor(Math.random()*8)));
+        result = arr.join(' ');
+      } else {
+        // paragraphs
+        const arr = [];
+        for(let i=0;i<amt;i++) arr.push(paragraphFromWords(words, 3 + Math.floor(Math.random()*3)));
+        if(useHtml) result = arr.map(p => `<p>${p}</p>`).join('\n\n');
+        else result = arr.join('\n\n');
+      }
+
+      outputEl.textContent = result;
+    }
+
+    generateBtn.addEventListener('click', generate);
+
+    copyBtn.addEventListener('click', async ()=>{
+      try{ await navigator.clipboard.writeText(outputEl.textContent); alert('Copied to clipboard'); }catch(e){ alert('Copy failed — allow clipboard access'); }
+    });
+
+    downloadBtn.addEventListener('click', ()=>{
+      const text = outputEl.textContent;
+      if(!text) return alert('No text to download');
+      const blob = new Blob([text], {type:'text/plain'});
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='lorem.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    downloadHtmlBtn.addEventListener('click', ()=>{
+      const html = outputEl.textContent;
+      if(!html) return alert('No text to download');
+      // if user requested HTML output (paragraphs) we assume it already has <p> tags when includeHtml checked
+      const content = includeHtmlEl.checked ? html : `<p>${html.replace(/\n\n/g,'</p>\n\n<p>')}</p>`;
+      const blob = new Blob([content], {type:'text/html'});
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='lorem.html'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    // click any word in output to copy
+    outputEl.addEventListener('click', (e)=>{
+      const sel = window.getSelection().toString().trim();
+      if(sel){ navigator.clipboard.writeText(sel).then(()=>alert('Copied: '+sel)); }
+    });
+
+    // placeholder: fetch from server or external lipsum API
+    async function fetchFromApi(type='paragraphs', amount=3){
+      // Example: return fetch('/api/lorem?type='+type+'&amount='+amount).then(r=>r.text());
+      return null;
+    }
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<title>Profit Margin Calculator – Free Online Profit % Tool | Storedropship.in</title>
+<meta name="description" content="Use our free Profit Margin Calculator to find out your profit percentage in seconds. Perfect for sellers and retailers.">
+<link rel="canonical" href="https://storedropship.in/profit-margin-calculator/">
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"SoftwareApplication",
+  "name":"Profit Margin Calculator",
+  "url":"https://storedropship.in/profit-margin-calculator/",
+  "applicationCategory":"BusinessApplication",
+  "operatingSystem":"All",
+  "offers":{"@type":"Offer","price":"0","priceCurrency":"INR"}
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"FAQPage",
+  "mainEntity":[
+    {"@type":"Question","name":"How is profit margin calculated?","acceptedAnswer":{"@type":"Answer","text":"Subtract cost price from selling price, divide by selling price, and multiply by 100."}},
+    {"@type":"Question","name":"Can I use this calculator for any currency?","acceptedAnswer":{"@type":"Answer","text":"Yes, just enter your values in INR or any unit; the formula remains the same."}}
+  ]
+}
+</script>
+
+<script>
+function calculateMargin() {
+  var sp = parseFloat(document.getElementById('sp').value);
+  var cp = parseFloat(document.getElementById('cp').value);
+  var result = document.getElementById('marginResult');
+
+  if (!isNaN(sp) && !isNaN(cp) && sp !== 0) {
+    var margin = ((sp - cp) / sp) * 100;
+    result.innerHTML = "✅ Profit Margin: " + margin.toFixed(2) + "%";
+  } else {
+    result.innerHTML = "❌ Please enter valid values.";
+  }
+}
+
+// Attach event listeners immediately (Elementor optimization)
+var spInput = document.getElementById('sp');
+var cpInput = document.getElementById('cp');
+
+if(spInput && cpInput){
+  spInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      calculateMargin();
+    }
+  });
+
+  cpInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      calculateMargin();
+    }
+  });
+}
+</script>
+
+<div class="container">
+  <h2>📈 Profit Margin Calculator</h2>
+
+  <input type="number" id="sp" placeholder="Enter Selling Price (₹)">
+  <input type="number" id="cp" placeholder="Enter Cost Price (₹)">
+
+  <button onclick="calculateMargin()">Calculate Profit Margin</button>
+
+  <div class="result" id="marginResult"></div>
+
+  <a href="/tools" class="back-link">🔙 Back to Tools</a>
+</div>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Text to Speech Pro — Free Online AI Voice Generator</title>
+  <meta name="description" content="Text to Speech Pro - Convert text to natural-sounding speech online. Choose male/female voices, control speed and pitch. Perfect for blogs, videos and accessibility." />
+  <meta name="keywords" content="text to speech, tts, ai voice generator, online voice generator, convert text to audio, speech synthesis, free tts tool" />
+  <meta name="author" content="storedropship.in" />
+  <style>
+    :root{
+      --bg:#f6f8fb; --card:#fff; --accent:#0b7a5b; --muted:#6b7280; --pro:#b7892b;
+      --radius:12px; font-family: Inter, "Segoe UI", Arial, sans-serif;
+    }
+    body{margin:0;background:var(--bg);color:#111;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
+    .wrap{max-width:980px;width:100%;}
+    .card{background:var(--card);padding:20px;border-radius:var(--radius);box-shadow:0 8px 30px rgba(15,23,42,0.06);}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .title{display:flex;gap:12px;align-items:center;}
+    h1{font-size:20px;margin:0;}
+    .pro-badge{background:linear-gradient(90deg,#f7d488,#e2b75b);color:#3b2f09;padding:6px 10px;border-radius:999px;font-weight:600;font-size:13px;}
+    p.lead{margin:10px 0 16px;color:var(--muted);}
+    .grid{display:grid;grid-template-columns:1fr 320px;gap:18px;}
+    .panel{padding:12px;border-radius:10px;background:linear-gradient(180deg,#ffffff, #fbfbfd);border:1px solid rgba(15,23,42,0.03);}
+    textarea#textIn{width:100%;min-height:220px;padding:12px;border-radius:8px;border:1px solid #e6e9ef;resize:vertical;font-size:15px;line-height:1.5;}
+    label.small{font-size:13px;color:var(--muted);display:block;margin-bottom:6px;}
+    select,input[type=range]{width:100%;}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+    button{background:var(--accent);color:#fff;border:none;padding:10px 12px;border-radius:8px;cursor:pointer;font-weight:600;}
+    button.secondary{background:#475569;}
+    button.ghost{background:transparent;color:#111;border:1px solid #e6e9ef;}
+    button.pro{background:var(--pro);color:#2e1f00;}
+    .small-muted{font-size:13px;color:var(--muted);margin-top:8px;}
+    .meta{font-size:13px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
+    .right-col{display:flex;flex-direction:column;gap:12px;}
+    .row{display:flex;gap:8px;align-items:center;}
+    .stat{background:#fbfbfb;border:1px dashed #e6e9ef;padding:8px;border-radius:8px;text-align:center;}
+    .note{font-size:13px;color:#7b8087;}
+    footer{margin-top:14px;font-size:13px;color:var(--muted);text-align:center;}
+    @media (max-width:880px){ .grid{grid-template-columns:1fr; } .right-col{order:2} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <header>
+        <div class="title">
+          <h1>🔊 Text to Speech Pro</h1>
+          <div class="pro-badge">⭐ PRO</div>
+        </div>
+        <div class="meta">
+          <div class="note">Play instantly with your browser's voice engine</div>
+        </div>
+      </header>
+
+      <p class="lead">Convert text into natural-sounding speech. Choose voice, speed and pitch. (Download is a Pro / future feature.)</p>
+
+      <div class="grid">
+        <div class="panel">
+          <label class="small">Enter text to convert</label>
+          <textarea id="textIn" placeholder="Type or paste your text here... (Max recommended 5,000 characters)"></textarea>
+
+          <div class="controls" style="margin-top:10px">
+            <button id="playBtn">Play ▶</button>
+            <button id="stopBtn" class="secondary">Stop ▢</button>
+            <button id="copyBtn" class="ghost">Copy Text</button>
+            <button id="clearBtn" class="ghost">Clear</button>
+            <button id="downloadBtn" class="pro">Download (Pro)</button>
+          </div>
+
+          <div class="small-muted" style="margin-top:10px">
+            <span id="charsCount">0</span> characters • <span id="wordsCount">0</span> words
+          </div>
+
+          <div style="margin-top:12px" class="small-muted">
+            Tip: For best results keep sentences short. Use punctuation for natural pauses.
+          </div>
+        </div>
+
+        <aside class="right-col">
+          <div class="panel">
+            <label class="small">Voice</label>
+            <select id="voiceSelect"></select>
+
+            <div style="height:12px"></div>
+
+            <label class="small">Speed (0.5 = slow, 1 = normal, 2 = fast)</label>
+            <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1">
+
+            <label class="small" style="margin-top:8px">Pitch (0 = low, 1 = default, 2 = high)</label>
+            <input type="range" id="pitch" min="0" max="2" step="0.1" value="1">
+
+            <div style="height:12px"></div>
+
+            <label class="small">Volume</label>
+            <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
+
+            <div style="height:12px"></div>
+
+            <div class="row" style="margin-top:8px">
+              <div class="stat" style="flex:1">
+                <div style="font-weight:700" id="voiceLang">—</div>
+                <div style="font-size:12px;color:var(--muted)">Language</div>
+              </div>
+              <div class="stat" style="flex:1">
+                <div style="font-weight:700" id="voiceCount">—</div>
+                <div style="font-size:12px;color:var(--muted)">Voices</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div style="font-weight:700">How to use</div>
+            <ul style="margin:8px 0 0 18px;color:var(--muted);font-size:14px">
+              <li>Type/paste text.</li>
+              <li>Choose voice, rate, pitch and volume.</li>
+              <li>Click <strong>Play</strong> to listen.</li>
+            </ul>
+            <div style="height:10px"></div>
+            <div class="note">Download audio will be enabled in Pro (server-side TTS or cloud API needed for reliable audio file).</div>
+          </div>
+        </aside>
+      </div>
+
+      <footer>© storedropship.in • Tools Hub • Contact: +91 9258036351 • contact@storedropship.in</footer>
+    </div>
+  </div>
+
+  <script>
+    // Text to Speech Pro - client-side using SpeechSynthesis (browser)
+    const synth = window.speechSynthesis;
+    const textIn = document.getElementById('textIn');
+    const playBtn = document.getElementById('playBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const voiceSelect = document.getElementById('voiceSelect');
+    const rateEl = document.getElementById('rate');
+    const pitchEl = document.getElementById('pitch');
+    const volumeEl = document.getElementById('volume');
+    const copyBtn = document.getElementById('copyBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const charsCount = document.getElementById('charsCount');
+    const wordsCount = document.getElementById('wordsCount');
+    const voiceLang = document.getElementById('voiceLang');
+    const voiceCount = document.getElementById('voiceCount');
+
+    let voices = [];
+
+    function populateVoices() {
+      voices = synth.getVoices() || [];
+      voiceSelect.innerHTML = '';
+      // prefer show language & voice name
+      voices.forEach((v, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = `${v.name} — ${v.lang}${v.default ? ' (default)' : ''}`;
+        voiceSelect.appendChild(opt);
+      });
+      if(voices.length) {
+        voiceCount.textContent = voices.length;
+        voiceLang.textContent = voices[0].lang || '—';
+      } else {
+        voiceCount.textContent = '0';
+        voiceLang.textContent = '—';
+        const opt = document.createElement('option');
+        opt.textContent = 'No voices available in this browser';
+        voiceSelect.appendChild(opt);
+      }
+    }
+
+    // Some browsers load voices asynchronously
+    populateVoices();
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = populateVoices;
+    }
+
+    function updateCounts() {
+      const text = textIn.value || '';
+      charsCount.textContent = text.length;
+      wordsCount.textContent = text.trim().length ? text.trim().split(/\s+/).length : 0;
+    }
+
+    textIn.addEventListener('input', updateCounts);
+
+    let currentUtterance = null;
+
+    function playSpeech() {
+      const text = textIn.value.trim();
+      if(!text) { alert('Please enter some text to play.'); return; }
+      if(synth.speaking) {
+        // stop previous then start new
+        synth.cancel();
+      }
+      const utter = new SpeechSynthesisUtterance(text);
+      const selectedVoiceIndex = parseInt(voiceSelect.value);
+      if(!isNaN(selectedVoiceIndex) && voices[selectedVoiceIndex]) {
+        utter.voice = voices[selectedVoiceIndex];
+      }
+      utter.rate = parseFloat(rateEl.value) || 1;
+      utter.pitch = parseFloat(pitchEl.value) || 1;
+      utter.volume = parseFloat(volumeEl.value) || 1;
+      utter.onstart = () => {
+        playBtn.textContent = 'Playing ▶';
+        playBtn.disabled = true;
+      };
+      utter.onend = () => {
+        playBtn.textContent = 'Play ▶';
+        playBtn.disabled = false;
+      };
+      utter.onerror = (e) => {
+        console.error('TTS error', e);
+        alert('Speech error. Your browser may not support all TTS features.');
+        playBtn.textContent = 'Play ▶';
+        playBtn.disabled = false;
+      };
+      currentUtterance = utter;
+      synth.speak(utter);
+    }
+
+    function stopSpeech() {
+      if(synth.speaking) {
+        synth.cancel();
+        playBtn.textContent = 'Play ▶';
+        playBtn.disabled = false;
+      }
+    }
+
+    playBtn.addEventListener('click', playSpeech);
+    stopBtn.addEventListener('click', stopSpeech);
+
+    copyBtn.addEventListener('click', async () => {
+      const text = textIn.value;
+      if(!text) { alert('No text to copy.'); return; }
+      try {
+        await navigator.clipboard.writeText(text);
+        copyBtn.textContent = 'Copied ✓';
+        setTimeout(()=> copyBtn.textContent = 'Copy Text', 1200);
+      } catch (e) {
+        alert('Clipboard not available.');
+      }
+    });
+
+    clearBtn.addEventListener('click', () => {
+      textIn.value = '';
+      updateCounts();
+    });
+
+    // Download is a Pro placeholder (server-side or cloud TTS needed for reliable downloadable files)
+    downloadBtn.addEventListener('click', () => {
+      alert('Download audio is a Pro feature. We will enable server-side download (MP3/WAV) in Pro release. Leave your email to get early access.');
+      // Optionally open a signup popup or anchor to email capture (implement later)
+    });
+
+    // keyboard shortcuts: Ctrl+Enter to play
+    textIn.addEventListener('keydown', (e) => {
+      if(e.ctrlKey && e.key === 'Enter') {
+        e.preventDefault();
+        playSpeech();
+      }
+    });
+
+    // initialize counts
+    updateCounts();
+  </script>
+</body>
+</html>

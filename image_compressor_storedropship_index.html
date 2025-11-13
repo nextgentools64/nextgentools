@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Image Compressor — Storedropship Tool</title>
+<meta name="description" content="Compress image files online. Reduce file size of PNG, JPEG, or JPG images while maintaining quality. Download compressed image instantly." />
+<meta name="keywords" content="Image compressor, compress image online, PNG compressor, JPEG compressor, reduce image size" />
+<style>
+:root{--bg:#f9fafb;--card:#fff;--muted:#6b7280;--accent:#0ea5a4}
+*{box-sizing:border-box;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif}
+body{margin:0;padding:20px;background:linear-gradient(180deg,var(--bg),#eef2ff);color:#111827}
+.wrap{max-width:960px;margin:0 auto}
+.card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.05);margin-bottom:14px}
+h1{margin-bottom:6px;font-size:20px}
+p.lead{margin:0 0 12px;color:var(--muted)}
+input{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef6;font-size:14px;margin-top:8px}
+.controls{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+button.primary{background:var(--accent);color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer}
+button.alt{background:#fff;border:1px solid #e6eef6;color:#0b5394;padding:10px;border-radius:8px}
+img{max-width:100%;border-radius:8px;margin-top:8px}
+.meta{font-size:13px;color:var(--muted);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card">
+<h1>Image Compressor</h1>
+<p class="lead">Compress your images online to reduce file size without losing quality. Supports PNG, JPEG, and JPG formats.</p>
+<input type="file" id="fileInput" accept="image/*" />
+<div class="controls">
+<button class="primary" id="compressBtn">Compress Image</button>
+<button class="alt" id="downloadBtn">Download Compressed</button>
+<button class="alt" id="clearBtn">Clear</button>
+</div>
+<img id="preview" alt="Preview will appear here" />
+<div class="meta">Tip: Smaller images load faster on websites and save storage.</div>
+</div>
+<div class="card">
+<h2>Description</h2>
+<p style="margin:0;color:#374151;line-height:1.6">This Image Compressor lets users reduce the file size of images quickly while preserving quality. Features include:</p>
+<ul style="margin-top:6px;color:#374151">
+<li>Supports PNG, JPEG, JPG formats.</li>
+<li>Compress images without noticeable quality loss.</li>
+<li>Preview compressed image before download.</li>
+<li>Offline-ready and lightweight.</li>
+</ul>
+</div>
+</div>
+<script>
+const fileInput=document.getElementById('fileInput');
+const compressBtn=document.getElementById('compressBtn');
+const downloadBtn=document.getElementById('downloadBtn');
+const clearBtn=document.getElementById('clearBtn');
+const preview=document.getElementById('preview');
+let compressedDataURL='';
+
+compressBtn.addEventListener('click',()=>{
+  const file=fileInput.files[0];
+  if(!file)return alert('Select an image first');
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.src=ev.target.result;
+    img.onload=()=>{
+      const canvas=document.createElement('canvas');
+      canvas.width=img.width;
+      canvas.height=img.height;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0);
+      compressedDataURL=canvas.toDataURL('image/jpeg',0.7);
+      preview.src=compressedDataURL;
+      alert('Compression done');
+    };
+  };
+  reader.readAsDataURL(file);
+});
+
+downloadBtn.addEventListener('click',()=>{
+  if(!compressedDataURL)return alert('No compressed image available');
+  const a=document.createElement('a'); a.href=compressedDataURL; a.download='compressed.jpg'; a.click();
+});
+
+clearBtn.addEventListener('click',()=>{fileInput.value='';preview.src='';compressedDataURL='';});
+</script>
+</body>
+</html>

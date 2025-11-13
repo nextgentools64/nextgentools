@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Global Discount Calculator – Calculate Savings Worldwide | Storedropship.in</title>
+<meta name="description" content="Free worldwide discount calculator. Calculate savings instantly in any currency. Supports multiple languages for global users.">
+<style>
+:root {
+  --primary-color: #007bff;
+  --primary-hover: #0056b3;
+  --success-bg: #e6ffe6;
+  --success-color: #007700;
+  --error-bg: #ffe6e6;
+  --error-color: #cc0000;
+  --border-radius: 12px;
+  --transition-speed: 0.3s;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 60px 20px 20px;
+  background: linear-gradient(135deg, #f8faff 0%, #eef2f7 100%);
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  direction: ltr;
+}
+
+body.rtl {
+  direction: rtl;
+}
+
+.discount-container {
+  max-width: 550px;
+  width: 100%;
+  background: #ffffff;
+  border-radius: var(--border-radius);
+  padding: 30px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  animation: fadeIn 0.6s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.discount-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, var(--primary-color), #5b9eff, #007bff);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.discount-container h1 {
+  text-align: center;
+  color: var(--primary-color);
+  margin-bottom: 15px;
+  font-size: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.discount-container h1 .globe-icon {
+  font-size: 1.8rem;
+}
+
+.discount-container p.intro {
+  text-align: center;
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 25px;
+}
+
+.language-selector {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 25px;
+}
+
+.language-selector select {
+  padding: 8px 15px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color var(--transition-speed);
+}
+
+.language-selector select:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #555;
+  font-size: 1rem;
+}
+
+.currency-input {
+  position: relative;
+}
+
+.currency-input select {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  font-weight: bold;
+  color: #555;
+  cursor: pointer;
+  z-index: 2;
+  padding-right: 5px;
+}
+
+body.rtl .currency-input select {
+  left: auto;
+  right: 12px;
+}
+
+.currency-input input {
+  width: 100%;
+  padding: 12px 12px 12px 45px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  box-sizing: border-box;
+  transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+body.rtl .currency-input input {
+  padding: 12px 45px 12px 12px;
+}
+
+.currency-input input:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.discount-container button {
+  width: 100%;
+  padding: 15px;
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background-color var(--transition-speed), transform 0.2s ease;
+}
+
+.discount-container button:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+.discount-container button:active {
+  transform: translateY(0);
+}
+
+.discount-container .result {
+  margin-top: 25px;
+  padding: 20px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 8px;
+  border: 1px solid;
+  animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.result.success {
+  background-color: var(--success-bg);
+  color: var(--success-color);
+  border-color: var(--success-color);
+}
+
+.result.error {
+  background-color: var(--error-bg);
+  color: var(--error-color);
+  border-color: var(--error-color);
+}
+
+.result .savings-amount {
+  font-size: 1.4rem;
+  margin-top: 10px;
+  display: block;
+}
+
+.discount-container .back-link {
+  display: block;
+  text-align: center;
+  margin-top: 25px;
+  text-decoration: none;
+  color: var(--primary-color);
+  font-weight: bold;
+  font-size: 1.05rem;
+  transition: color var(--transition-speed);
+}
+
+.discount-container .back-link:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+.additional-info {
+  margin-top: 25px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #666;
+}
+
+.additional-info h3 {
+  color: var(--primary-color);
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.additional-info ul {
+  padding-left: 20px;
+}
+
+body.rtl .additional-info ul {
+  padding-left: 0;
+  padding-right: 20px;
+}
+
+.additional-info li {
+  margin-bottom: 5px;
+}
+
+@media (max-width: 480px) {
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .discount-container h1 {
+    font-size: 1.8rem;
+  }
+}
+
+.country-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #f0f7ff;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #0066cc;
+}
+
+.country-info .flag {
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+body.rtl .country-info .flag {
+  margin-right: 0;
+  margin-left: 10px;
+}
+
+.price-example {
+  font-size: 12px;
+  color: #777;
+  margin-top: 5px;
+  font-style: italic;
+}
+</style>
+</head>
+<body>
+<div class="discount-container">
+  <h1><span class="globe-icon">🌐</span> <span id="pageTitle">Global Discount Calculator</span></h1>
+  <p class="intro" id="pageIntro">
+    Calculate your savings instantly in any currency. Supports multiple languages for worldwide users.
+  </p>
+  
+  <div class="language-selector">
+    <select id="languageSelect" onchange="changeLanguage()">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+      <option value="fr">Français</option>
+      <option value="de">Deutsch</option>
+      <option value="hi">हिन्दी</option>
+      <option value="zh">中文</option>
+      <option value="ar">العربية</option>
+      <option value="pt">Português</option>
+      <option value="ru">Русский</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+  
+  <div class="country-info" id="countryInfo">
+    <span class="flag" id="countryFlag">🇺🇸</span>
+    <span id="countryName">United States</span>
+  </div>
+  
+  <div class="form-row">
+    <div class="form-group">
+      <label for="originalPrice" id="originalPriceLabel">Original Price:</label>
+      <div class="currency-input">
+        <select id="originalCurrency">
+          <option value="$">$ USD</option>
+          <option value="€">€ EUR</option>
+          <option value="£">£ GBP</option>
+          <option value="¥">¥ JPY</option>
+          <option value="₹">₹ INR</option>
+          <option value="₽">₽ RUB</option>
+          <option value="₩">₩ KRW</option>
+          <option value="₺">₺ TRY</option>
+          <option value="R$">R$ BRL</option>
+          <option value="C$">C$ CAD</option>
+          <option value="A$">A$ AUD</option>
+        </select>
+        <input type="number" id="originalPrice" placeholder="e.g., 100" min="0" step="0.01">
+        <div class="price-example" id="originalPriceExample"></div>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="discountedPrice" id="discountedPriceLabel">Discounted Price:</label>
+      <div class="currency-input">
+        <select id="discountedCurrency">
+          <option value="$">$ USD</option>
+          <option value="€">€ EUR</option>
+          <option value="£">£ GBP</option>
+          <option value="¥">¥ JPY</option>
+          <option value="₹">₹ INR</option>
+          <option value="₽">₽ RUB</option>
+          <option value="₩">₩ KRW</option>
+          <option value="₺">₺ TRY</option>
+          <option value="R$">R$ BRL</option>
+          <option value="C$">C$ CAD</option>
+          <option value="A$">A$ AUD</option>
+        </select>
+        <input type="number" id="discountedPrice" placeholder="e.g., 80" min="0" step="0.01">
+        <div class="price-example" id="discountedPriceExample"></div>
+      </div>
+    </div>
+  </div>
+  
+  <button id="calculateButton" onclick="calculateDiscount()">Calculate Discount</button>
+  <div class="result" id="discountResult"></div>
+  
+  <div class="additional-info">
+    <h3 id="howToUseTitle">How to Use This Calculator</h3>
+    <ul id="instructionsList">
+      <li id="instruction1">Select your preferred language and country</li>
+      <li id="instruction2">The currency will automatically update based on your selection</li>
+      <li id="instruction3">Enter the original price and discounted price</li>
+      <li id="instruction4">Click "Calculate Discount" to see your savings</li>
+      <li id="instruction5">Results show discount percentage and amount saved</li>
+    </ul>
+  </div>
+  
+  <a href="/tools" class="back-link" id="backToToolsLink">🔙 Back to Tools Hub</a>
+</div>
+
+<script>
+// Country and currency mapping for each language
+const languageCountryMap = {
+  en: { 
+    name: "United States", 
+    flag: "🇺🇸", 
+    currency: "$",
+    currencyIndex: 0,
+    isRTL: false,
+    exampleOriginalPrice: "49.99",
+    exampleDiscountedPrice: "39.99"
+  },
+  es: { 
+    name: "España", 
+    flag: "🇪🇸", 
+    currency: "€",
+    currencyIndex: 1,
+    isRTL: false,
+    exampleOriginalPrice: "45.99",
+    exampleDiscountedPrice: "36.99"
+  },
+  fr: { 
+    name: "France", 
+    flag: "🇫🇷", 
+    currency: "€",
+    currencyIndex: 1,
+    isRTL: false,
+    exampleOriginalPrice: "42.99",
+    exampleDiscountedPrice: "34.99"
+  },
+  de: { 
+    name: "Deutschland", 
+    flag: "🇩🇪", 
+    currency: "€",
+    currencyIndex: 1,
+    isRTL: false,
+    exampleOriginalPrice: "44.99",
+    exampleDiscountedPrice: "35.99"
+  },
+  hi: { 
+    name: "भारत", 
+    flag: "🇮🇳", 
+    currency: "₹",
+    currencyIndex: 4,
+    isRTL: false,
+    exampleOriginalPrice: "2999",
+    exampleDiscountedPrice: "1999"
+  },
+  zh: { 
+    name: "中国", 
+    flag: "🇨🇳", 
+    currency: "¥",
+    currencyIndex: 3,
+    isRTL: false,
+    exampleOriginalPrice: "299",
+    exampleDiscountedPrice: "199"
+  },
+  ar: { 
+    name: "المملكة العربية السعودية", 
+    flag: "🇸🇦", 
+    currency: "₺",
+    currencyIndex: 7,
+    isRTL: true,
+    exampleOriginalPrice: "299.99",
+    exampleDiscountedPrice: "249.99"
+  },
+  pt: { 
+    name: "Brasil", 
+    flag: "🇧🇷", 
+    currency: "R$",
+    currencyIndex: 8,
+    isRTL: false,
+    exampleOriginalPrice: "199.99",
+    exampleDiscountedPrice: "149.99"
+  },
+  ru: { 
+    name: "Россия", 
+    flag: "🇷🇺", 
+    currency: "₽",
+    currencyIndex: 5,
+    isRTL: false,
+    exampleOriginalPrice: "3999",
+    exampleDiscountedPrice: "2999"
+  },
+  ja: { 
+    name: "日本", 
+    flag: "🇯🇵", 
+    currency: "¥",
+    currencyIndex: 3,
+    isRTL: false,
+    exampleOriginalPrice: "4980",
+    exampleDiscountedPrice: "3980"
+  }
+};
+
+// Translations for multiple languages
+const translations = {
+  en: {
+    title: "Global Discount Calculator",
+    intro: "Calculate your savings instantly in any currency. Supports multiple languages for worldwide users.",
+    originalPrice: "Original Price:",
+    discountedPrice: "Discounted Price:",
+    calculate: "Calculate Discount",
+    errorBothValues: "❌ Please enter both values.",
+    errorOriginalPrice: "❌ Original price cannot be zero or negative.",
+    errorDiscountPrice: "❌ Discounted price cannot be greater than original price.",
+    saved: "✅ You saved ",
+    noDiscount: "ℹ️ No discount applied.",
+    calculationError: "❌ Error in calculation.",
+    savingsAmount: "Amount saved: ",
+    howToUse: "How to Use This Calculator",
+    instructions: [
+      "Select your preferred language and country",
+      "The currency will automatically update based on your selection",
+      "Enter the original price and discounted price",
+      "Click \"Calculate Discount\" to see your savings",
+      "Results show discount percentage and amount saved"
+    ],
+    backToTools: "🔙 Back to Tools Hub",
+    originalPlaceholder: "e.g., 100",
+    discountedPlaceholder: "e.g., 80",
+    priceExample: "Example: "
+  },
+  es: {
+    title: "Calculadora Global de Descuentos",
+    intro: "Calcula tus ahorros al instante en cualquier moneda. Soporta múltiples idiomas para usuarios de todo el mundo.",
+    originalPrice: "Precio Original:",
+    discountedPrice: "Precio con Descuento:",
+    calculate: "Calcular Descuento",
+    errorBothValues: "❌ Por favor ingrese ambos valores.",
+    errorOriginalPrice: "❌ El precio original no puede ser cero o negativo.",
+    errorDiscountPrice: "❌ El precio con descuento no puede ser mayor que el precio original.",
+    saved: "✅ Ahorraste ",
+    noDiscount: "ℹ️ No se aplicó descuento.",
+    calculationError: "❌ Error en el cálculo.",
+    savingsAmount: "Cantidad ahorrada: ",
+    howToUse: "Cómo Usar Esta Calculadora",
+    instructions: [
+      "Selecciona tu idioma y país preferidos",
+      "La moneda se actualizará automáticamente según tu selección",
+      "Ingresa el precio original y el precio con descuento",
+      "Haz clic en \"Calcular Descuento\" para ver tus ahorros",
+      "Los resultados muestran el porcentaje de descuento y la cantidad ahorrada"
+    ],
+    backToTools: "🔙 Volver al Centro de Herramientas",
+    originalPlaceholder: "ej., 100",
+    discountedPlaceholder: "ej., 80",
+    priceExample: "Ejemplo: "
+  },
+  fr: {
+    title: "Calculateur Mondial de Remise",
+    intro: "Calculez vos économies instantanément dans n'importe quelle devise. Prend en charge plusieurs langues pour les utilisateurs du monde entier.",
+    originalPrice: "Prix Original:",
+    discountedPrice: "Prix Remisé:",
+    calculate: "Calculer la Remise",
+    errorBothValues: "❌ Veuillez saisir les deux valeurs.",
+    errorOriginalPrice: "❌ Le prix original ne peut être zéro ou négatif.",
+    errorDiscountPrice: "❌ Le prix remisé ne peut être supérieur au prix original.",
+    saved: "✅ Vous avez économisé ",
+    noDiscount: "ℹ️ Aucune remise appliquée.",
+    calculationError: "❌ Erreur de calcul.",
+    savingsAmount: "Montant économisé: ",
+    howToUse: "Comment Utiliser Cette Calculatrice",
+    instructions: [
+      "Sélectionnez votre langue et pays préférés",
+      "La devise sera automatiquement mise à jour en fonction de votre sélection",
+      "Entrez le prix original et le prix remisé",
+      "Cliquez sur \"Calculer la Remise\" pour voir vos économies",
+      "Les résultats affichent le pourcentage de remise et le montant économisé"
+    ],
+    backToTools: "🔙 Retour au Hub d'Outils",
+    originalPlaceholder: "par ex., 100",
+    discountedPlaceholder: "par ex., 80",
+    priceExample: "Exemple: "
+  },
+  de: {
+    title: "Globaler Rabattrechner",
+    intro: "Berechnen Sie Ihre Ersparnisse sofort in jeder Währung. Unterstützt mehrere Sprachen für Nutzer weltweit.",
+    originalPrice: "Originalpreis:",
+    discountedPrice: "Rabattierter Preis:",
+    calculate: "Rabatt Berechnen",
+    errorBothValues: "❌ Bitte beide Werte eingeben.",
+    errorOriginalPrice: "❌ Der Originalpreis kann nicht Null oder negativ sein.",
+    errorDiscountPrice: "❌ Der rabattierte Preis kann nicht höher als der Originalpreis sein.",
+    saved: "✅ Sie haben gespart ",
+    noDiscount: "ℹ️ Kein Rabatt angewendet.",
+    calculationError: "❌ Fehler bei der Berechnung.",
+    savingsAmount: "Gesparter Betrag: ",
+    howToUse: "Wie Man Diesen Rechner Verwendet",
+    instructions: [
+      "Wählen Sie Ihre bevorzugte Sprache und Ihr Land",
+      "Die Währung wird automatisch basierend auf Ihrer Auswahl aktualisiert",
+      "Geben Sie den Originalpreis und den rabattierten Preis ein",
+      "Klicken Sie auf \"Rabatt Berechnen\", um Ihre Ersparnisse zu sehen",
+      "Die Ergebnisse zeigen Rabattprozentsatz und gesparten Betrag"
+    ],
+    backToTools: "🔙 Zurück zum Werkzeug-Hub",
+    originalPlaceholder: "z.B., 100",
+    discountedPlaceholder: "z.B., 80",
+    priceExample: "Beispiel: "
+  },
+  hi: {
+    title: "ग्लोबल डिस्काउंट कैलकुलेटर",
+    intro: "किसी भी मुद्रा में तुरंत अपनी बचत की गणना करें। विश्वव्यापी उपयोगकर्ताओं के लिए कई भाषाओं का समर्थन करता है।",
+    originalPrice: "मूल मूल्य:",
+    discountedPrice: "छूट वाला मूल्य:",
+    calculate: "छूट की गणना करें",
+    errorBothValues: "❌ कृपया दोनों मान दर्ज करें।",
+    errorOriginalPrice: "❌ मूल मूल्य शून्य या नकारात्मक नहीं हो सकता।",
+    errorDiscountPrice: "❌ छूट वाला मूल्य मूल मूल्य से अधिक नहीं हो सकता।",
+    saved: "✅ आपने बचाया ",
+    noDiscount: "ℹ️ कोई छूट लागू नहीं हुई।",
+    calculationError: "❌ गणना में त्रुटि।",
+    savingsAmount: "बचाई गई राशि: ",
+    howToUse: "इस कैलकुलेटर का उपयोग कैसे करें",
+    instructions: [
+      "अपनी पसंदीदा भाषा और देश चुनें",
+      "मुद्रा आपकी चयन के आधार पर स्वचालित रूप से अपडेट हो जाएगी",
+      "मूल मूल्य और छूट वाला मूल्य दर्ज करें",
+      "अपनी बचत देखने के लिए \"छूट की गणना करें\" पर क्लिक करें",
+      "परिणाम छूट प्रतिशत और बचाई गई राशि दिखाते हैं"
+    ],
+    backToTools: "🔙 टूल्स हब पर वापस जाएं",
+    originalPlaceholder: "उदा., 100",
+    discountedPlaceholder: "उदा., 80",
+    priceExample: "उदाहरण: "
+  },
+  zh: {
+    title: "全球折扣计算器",
+    intro: "立即以任何货币计算您的节省。支持全球用户的多语言。",
+    originalPrice: "原价:",
+    discountedPrice: "折扣价:",
+    calculate: "计算折扣",
+    errorBothValues: "❌ 请输入两个值。",
+    errorOriginalPrice: "❌ 原价不能为零或负数。",
+    errorDiscountPrice: "❌ 折扣价不能高于原价。",
+    saved: "✅ 您节省了 ",
+    noDiscount: "ℹ️ 未应用折扣。",
+    calculationError: "❌ 计算错误。",
+    savingsAmount: "节省金额: ",
+    howToUse: "如何使用此计算器",
+    instructions: [
+      "选择您喜欢的语言和国家",
+      "货币将根据您的选择自动更新",
+      "输入原价和折扣价",
+      "点击"计算折扣"查看您的节省",
+      "结果显示折扣百分比和节省金额"
+    ],
+    backToTools: "🔙 返回工具中心",
+    originalPlaceholder: "例如，100",
+    discountedPlaceholder: "例如，80",
+    priceExample: "例如: "
+  },
+  ar: {
+    title: "آلة حاسبة عالمية للخصم",
+    intro: "احسب توفيرك فورًا بأي عملة. تدعم لغات متعددة للمستخدمين حول العالم.",
+    originalPrice: "السعر الأصلي:",
+    discountedPrice: "السعر بعد الخصم:",
+    calculate: "حساب الخصم",
+    errorBothValues: "❌ يرجى إدخال القيمتين.",
+    errorOriginalPrice: "❌ لا يمكن أن يكون السعر الأصلي صفرًا أو سالبًا.",
+    errorDiscountPrice: "❌ لا يمكن أن يكون السعر بعد الخصم أعلى من السعر الأصلي.",
+    saved: "✅ وفرت ",
+    noDiscount: "ℹ️ لم يتم تطبيق خصم.",
+    calculationError: "❌ خطأ في الحساب.",
+    savingsAmount: "المبلغ الموفور: ",
+    howToUse: "كيفية استخدام هذه الآلة الحاسبة",
+    instructions: [
+      "اختر لغتك ودولتك المفضلة",
+      "سيتم تحديث العملة تلقائيًا بناءً على اختيارك",
+      "أدخل السعر الأصلي والسعر بعد الخصم",
+      "انقر على "حساب الخصم" لرؤية توفيرك",
+      "تظهر النتائج نسبة الخصم والمبلغ الموفور"
+    ],
+    backToTools: "🔙 العودة إلى مركز الأدوات",
+    originalPlaceholder: "مثال، 100",
+    discountedPlaceholder: "مثال، 80",
+    priceExample: "مثال: "
+  },
+  pt: {
+    title: "Calculadora Global de Descontos",
+    intro: "Calcule suas economias instantaneamente em qualquer moeda. Suporta vários idiomas para usuários em todo o mundo.",
+    originalPrice: "Preço Original:",
+    discountedPrice: "Preço com Desconto:",
+    calculate: "Calcular Desconto",
+    errorBothValues: "❌ Por favor, insira ambos os valores.",
+    errorOriginalPrice: "❌ O preço original não pode ser zero ou negativo.",
+    errorDiscountPrice: "❌ O preço com desconto não pode ser maior que o preço original.",
+    saved: "✅ Você economizou ",
+    noDiscount: "ℹ️ Nenhum desconto aplicado.",
+    calculationError: "❌ Erro no cálculo.",
+    savingsAmount: "Valor economizado: ",
+    howToUse: "Como Usar Esta Calculadora",
+    instructions: [
+      "Selecione seu idioma e país preferidos",
+      "A moeda será atualizada automaticamente com base na sua seleção",
+      "Insira o preço original e o preço com desconto",
+      "Clique em "Calcular Desconto" para ver suas economias",
+      "Os resultados mostram a porcentagem de desconto e o valor economizado"
+    ],
+    backToTools: "🔙 Voltar ao Central de Ferramentas",
+    originalPlaceholder: "ex., 100",
+    discountedPlaceholder: "ex., 80",
+    priceExample: "Exemplo: "
+  },
+  ru: {
+    title: "Глобальный Калькулятор Скидок",
+    intro: "Мгновенно рассчитайте свою экономию в любой валюте. Поддерживает несколько языков для пользователей по всему миру.",
+    originalPrice: "Исходная цена:",
+    discountedPrice: "Цена со скидкой:",
+    calculate: "Рассчитать Скидку",
+    errorBothValues: "❌ Пожалуйста, введите оба значения.",
+    errorOriginalPrice: "❌ Исходная цена не может быть нулевой или отрицательной.",
+    errorDiscountPrice: "❌ Цена со скидкой не может быть выше исходной цены.",
+    saved: "✅ Вы сэкономили ",
+    noDiscount: "ℹ️ Скидка не применена.",
+    calculationError: "❌ Ошибка в расчете.",
+    savingsAmount: "Сэкономленная сумма: ",
+    howToUse: "Как Использовать Этот Калькулятор",
+    instructions: [
+      "Выберите предпочитаемый язык и страну",
+      "Валюта будет автоматически обновлена в соответствии с вашим выбором",
+      "Введите исходную цену и цену со скидкой",
+      "Нажмите "Рассчитать Скидку", чтобы увидеть вашу экономию",
+      "Результаты показывают процент скидки и сэкономленную сумму"
+    ],
+    backToTools: "🔙 Вернуться в Центр Инструментов",
+    originalPlaceholder: "напр., 100",
+    discountedPlaceholder: "напр., 80",
+    priceExample: "Пример: "
+  },
+  ja: {
+    title: "グローバル割引計算機",
+    intro: "任意の通貨で即座に節約額を計算します。世界中のユーザー向けに複数の言語をサポートしています。",
+    originalPrice: "元の価格:",
+    discountedPrice: "割引価格:",
+    calculate: "割引を計算する",
+    errorBothValues: "❌ 両方の値を入力してください。",
+    errorOriginalPrice: "❌ 元の価格はゼロまたは負の値にできません。",
+    errorDiscountPrice: "❌ 割引価格は元の価格より高くすることはできません。",
+    saved: "✅ あなたは節約しました ",
+    noDiscount: "ℹ️ 割引は適用されませんでした。",
+    calculationError: "❌ 計算エラー。",
+    savingsAmount: "節約額: ",
+    howToUse: "この計算機の使い方",
+    instructions: [
+      "好きな言語と国を選択します",
+      "通貨は選択に基づいて自動的に更新されます",
+      "元の価格と割引価格を入力します",
+      "節約額を表示するには「割引を計算する」をクリックします",
+      "結果には割引率と節約額が表示されます"
+    ],
+    backToTools: "🔙 ツールハブに戻る",
+    originalPlaceholder: "例えば、100",
+    discountedPlaceholder: "例えば、80",
+    priceExample: "例: "
+  }
+};
+
+// Set default language
+let currentLanguage = "en";
+
+// Change language function
+function changeLanguage() {
+  const languageSelect = document.getElementById("languageSelect");
+  currentLanguage = languageSelect.value;
+  updatePageLanguage();
+  updateCountryAndCurrency();
+  updatePageDirection();
+  updateExamplePrices();
+}
+
+// Update page text direction for RTL languages
+function updatePageDirection() {
+  const countryInfo = languageCountryMap[currentLanguage];
+  const body = document.body;
+  
+  if (countryInfo.isRTL) {
+    body.classList.add('rtl');
+  } else {
+    body.classList.remove('rtl');
+  }
+}
+
+// Update country and currency based on selected language
+function updateCountryAndCurrency() {
+  const countryInfo = languageCountryMap[currentLanguage];
+  
+  // Update country info display
+  document.getElementById("countryFlag").textContent = countryInfo.flag;
+  document.getElementById("countryName").textContent = countryInfo.name;
+  
+  // Update currency selectors
+  document.getElementById("originalCurrency").selectedIndex = countryInfo.currencyIndex;
+  document.getElementById("discountedCurrency").selectedIndex = countryInfo.currencyIndex;
+}
+
+// Update example prices based on selected language
+function updateExamplePrices() {
+  const countryInfo = languageCountryMap[currentLanguage];
+  const t = translations[currentLanguage];
+  
+  // Update example prices in input fields
+  document.getElementById("originalPrice").value = countryInfo.exampleOriginalPrice;
+  document.getElementById("discountedPrice").value = countryInfo.exampleDiscountedPrice;
+  
+  // Update example text below inputs
+  document.getElementById("originalPriceExample").textContent = 
+    t.priceExample + countryInfo.currency + countryInfo.exampleOriginalPrice;
+  document.getElementById("discountedPriceExample").textContent = 
+    t.priceExample + countryInfo.currency + countryInfo.exampleDiscountedPrice;
+  
+  // Clear previous results
+  document.getElementById("discountResult").innerHTML = "";
+  document.getElementById("discountResult").className = "result";
+}
+
+// Update page content based on selected language
+function updatePageLanguage() {
+  const t = translations[currentLanguage];
+  
+  // Update all text elements
+  document.getElementById("pageTitle").textContent = t.title;
+  document.getElementById("pageIntro").textContent = t.intro;
+  document.getElementById("originalPriceLabel").textContent = t.originalPrice;
+  document.getElementById("discountedPriceLabel").textContent = t.discountedPrice;
+  document.getElementById("calculateButton").textContent = t.calculate;
+  document.getElementById("howToUseTitle").textContent = t.howToUse;
+  document.getElementById("backToToolsLink").textContent = t.backToTools;
+  
+  // Update input placeholders
+  document.getElementById("originalPrice").placeholder = t.originalPlaceholder;
+  document.getElementById("discountedPrice").placeholder = t.discountedPlaceholder;
+  
+  // Update instructions list
+  const instructionsList = document.getElementById("instructionsList");
+  instructionsList.innerHTML = "";
+  
+  t.instructions.forEach((instruction, index) => {
+    const li = document.createElement("li");
+    li.id = `instruction${index + 1}`;
+    li.textContent = instruction;
+    instructionsList.appendChild(li);
+  });
+}
+
+function calculateDiscount() {
+  var originalPriceInput = document.getElementById('originalPrice');
+  var discountedPriceInput = document.getElementById('discountedPrice');
+  var originalCurrencySelect = document.getElementById('originalCurrency');
+  var discountedCurrencySelect = document.getElementById('discountedCurrency');
+  var resultDiv = document.getElementById('discountResult');
+  
+  var original = parseFloat(originalPriceInput.value);
+  var discount = parseFloat(discountedPriceInput.value);
+  var originalCurrency = originalCurrencySelect.value;
+  var discountedCurrency = discountedCurrencySelect.value;
+  
+  const t = translations[currentLanguage];
+  
+  resultDiv.innerHTML = "";
+  resultDiv.className = "result";
+  
+  if (isNaN(original) || isNaN(discount)) {
+    resultDiv.innerHTML = t.errorBothValues;
+    resultDiv.classList.add('error');
+    return;
+  }
+  
+  if (original <= 0) {
+    resultDiv.innerHTML = t.errorOriginalPrice;
+    resultDiv.classList.add('error');
+    return;
+  }
+  
+  if (discount > original) {
+    resultDiv.innerHTML = t.errorDiscountPrice;
+    resultDiv.classList.add('error');
+    return;
+  }
+  
+  var discountPercentage = ((original - discount) / original) * 100;
+  var savingsAmount = original - discount;
+  
+  if (discountPercentage > 0) {
+    resultDiv.innerHTML = t.saved + discountPercentage.toFixed(2) + "%!";
+    resultDiv.innerHTML += `<span class="savings-amount">${t.savingsAmount}${originalCurrency}${savingsAmount.toFixed(2)}</span>`;
+    resultDiv.classList.add('success');
+  } else if (discountPercentage === 0) {
+    resultDiv.innerHTML = t.noDiscount;
+    resultDiv.classList.add('success');
+  } else {
+    resultDiv.innerHTML = t.calculationError;
+    resultDiv.classList.add('error');
+  }
+}
+
+// Sync currency selectors
+document.getElementById('originalCurrency').addEventListener('change', function() {
+  document.getElementById('discountedCurrency').value = this.value;
+});
+
+document.getElementById('discountedCurrency').addEventListener('change', function() {
+  document.getElementById('originalCurrency').value = this.value;
+});
+
+// Add event listeners for Enter key and input clearing
+['originalPrice', 'discountedPrice'].forEach(function(id) {
+  var input = document.getElementById(id);
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      calculateDiscount();
+    }
+  });
+  
+  input.addEventListener('input', function() {
+    var resultDiv = document.getElementById('discountResult');
+    resultDiv.innerHTML = "";
+    resultDiv.className = "result";
+  });
+});
+
+// Initialize page language and country
+document.addEventListener('DOMContentLoaded', function() {
+  updatePageLanguage();
+  updateCountryAndCurrency();
+  updatePageDirection();
+  updateExamplePrices();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Color Picker — Storedropship Tool</title>
+  <meta name="description" content="Color Picker tool: pick colors, get HEX/RGB/HSL, build palettes, check contrast, and export CSS variables. Lightweight and offline-ready, inspired by W3Schools color picker." />
+  <meta name="keywords" content="Color Picker, HEX, RGB, HSL, Color Palette, Contrast Checker, CSS Variables, W3Schools" />
+  <style>
+    :root{--bg:#f6f9ff;--card:#fff;--muted:#6b7280;--accent:#0ea5a4}
+    *{box-sizing:border-box;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif}
+    body{margin:0;background:linear-gradient(180deg,var(--bg),#eef2ff);padding:20px;color:#0b1220}
+    .wrap{max-width:980px;margin:0 auto}
+    .card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 8px 30px rgba(10,20,40,0.06);margin-bottom:14px}
+    h1{margin:0 0 6px;font-size:20px}
+    p.lead{margin:0 0 12px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr 320px;gap:12px}
+    label{font-size:13px;color:#374151}
+    input[type=text], input[type=color], button, select{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef6;font-size:14px}
+    .controls{display:flex;gap:8px;margin-top:10px}
+    button.primary{background:var(--accent);color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer}
+    button.alt{background:#fff;border:1px solid #e6eef6;color:#0b5394;padding:10px;border-radius:8px}
+    .swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .swatch{width:48px;height:48px;border-radius:6px;border:1px solid #e6e9ef;cursor:pointer}
+    .preview{border-radius:8px;padding:12px;color:#fff;text-align:center}
+    pre{background:#f8fafc;padding:10px;border-radius:8px;border:1px solid #e6e9ef;overflow:auto}
+    .meta{font-size:13px;color:var(--muted);margin-top:10px}
+    @media(max-width:900px){.grid{grid-template-columns:1fr} .preview{margin-top:12px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Color Picker</h1>
+      <p class="lead">Pick colors, convert between <strong>HEX</strong>, <strong>RGB</strong> and <strong>HSL</strong>, build palettes, check contrast (WCAG-like), and export CSS variables. Works offline and is ready to embed into your site—W3Schools-style simplicity.</p>
+
+      <div class="grid">
+        <div>
+          <label for="colorInput">Choose Color</label>
+          <input id="colorInput" type="color" value="#0ea5a4" />
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+            <div>
+              <label>HEX</label>
+              <input id="hex" type="text" value="#0ea5a4" />
+            </div>
+            <div>
+              <label>RGB</label>
+              <input id="rgb" type="text" value="rgb(14,165,164)" />
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+            <div>
+              <label>HSL</label>
+              <input id="hsl" type="text" value="hsl(179,92%,35%)" />
+            </div>
+            <div>
+              <label>Opacity (alpha)</label>
+              <input id="alpha" type="text" value="1" />
+            </div>
+          </div>
+
+          <div class="controls">
+            <button class="primary" id="addPalette">Add to Palette</button>
+            <button class="alt" id="clearPalette">Clear Palette</button>
+          </div>
+
+          <div style="margin-top:12px">
+            <label>Palette</label>
+            <div id="palette" class="swatches"></div>
+            <div class="meta">Click a swatch to copy HEX. Drag and drop is not required for this offline demo.</div>
+          </div>
+
+          <div style="margin-top:12px">
+            <label>Quick swatches</label>
+            <div id="quickSwatches" class="swatches"></div>
+          </div>
+
+        </div>
+
+        <div>
+          <div id="previewBox" class="preview" style="background:#0ea5a4;min-height:180px">
+            <h2 id="previewTitle">Sample Heading</h2>
+            <p id="previewText">This is a preview area — background shows the selected color. Use Copy CSS to get variables for your project.</p>
+          </div>
+
+          <div style="margin-top:10px">
+            <label>CSS Output</label>
+            <pre id="cssOut">--color-primary: #0ea5a4;\n--color-primary-rgb: 14,165,164;\n--color-primary-hsl: 179,92%,35%;</pre>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="primary" id="copyCss">Copy CSS</button>
+            <button class="alt" id="exportVars">Download CSS</button>
+            <button class="alt" id="contrastCheck">Contrast Check</button>
+          </div>
+
+          <div id="contrastResult" class="meta" style="margin-top:10px">Contrast result will appear here.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 8px">Description</h2>
+      <p style="margin:0;color:#374151;line-height:1.6">This Color Picker replicates the essential features of popular color tools (like the W3Schools color picker) with added convenience for designers and developers: format conversions, palette creation, CSS variable export, and a basic contrast checker. It runs fully in the browser (no server needed) and is easy to extend—add color harmony generators, eyedropper API hooks, or save palettes to server later.</p>
+      <ul style="margin-top:8px;color:#374151">
+        <li>Formats supported: HEX, RGB, HSL, and alpha.</li>
+        <li>Build and copy palettes; quick swatches for common colors.</li>
+        <li>Export CSS variables for easy integration into your stylesheets.</li>
+        <li>Basic contrast checker (approximate WCAG ratios) to help with accessible color choices.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Utility conversions
+    function hexToRgb(hex){
+      hex = hex.replace('#','');
+      if(hex.length===3) hex = hex.split('').map(h=>h+h).join('');
+      const bigint = parseInt(hex,16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return {r,g,b};
+    }
+    function rgbToHex(r,g,b){
+      return '#' + [r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+    }
+    function rgbToHsl(r,g,b){
+      r/=255; g/=255; b/=255;
+      const max=Math.max(r,g,b), min=Math.min(r,g,b);
+      let h,s,l=(max+min)/2;
+      if(max===min){ h=0; s=0; } else {
+        const d = max-min;
+        s = l>0.5 ? d/(2-max-min) : d/(max+min);
+        switch(max){ case r: h=(g-b)/d + (g<b?6:0); break; case g: h=(b-r)/d + 2; break; case b: h=(r-g)/d + 4; break; }
+        h = Math.round(h*60);
+      }
+      s = Math.round(s*100);
+      l = Math.round(l*100);
+      return {h,s,l};
+    }
+    function hslString(h,s,l){ return `hsl(${h},${s}%,${l}%)`; }
+
+    // Contrast ratio (WCAG approximate)
+    function luminance(r,g,b){
+      const a = [r,g,b].map(v=>{
+        v/=255; return v<=0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055,2.4);
+      });
+      return 0.2126*a[0] + 0.7152*a[1] + 0.0722*a[2];
+    }
+    function contrastRatio(rgb1, rgb2){
+      const L1 = luminance(rgb1.r,rgb1.g,rgb1.b);
+      const L2 = luminance(rgb2.r,rgb2.g,rgb2.b);
+      const bright = Math.max(L1,L2), dark = Math.min(L1,L2);
+      return +( (bright+0.05) / (dark+0.05) ).toFixed(2);
+    }
+
+    // Elements
+    const colorInput = document.getElementById('colorInput');
+    const hexEl = document.getElementById('hex');
+    const rgbEl = document.getElementById('rgb');
+    const hslEl = document.getElementById('hsl');
+    const alphaEl = document.getElementById('alpha');
+    const previewBox = document.getElementById('previewBox');
+    const previewTitle = document.getElementById('previewTitle');
+    const previewText = document.getElementById('previewText');
+    const cssOut = document.getElementById('cssOut');
+    const paletteEl = document.getElementById('palette');
+    const quickSwatches = document.getElementById('quickSwatches');
+    const copyCssBtn = document.getElementById('copyCss');
+    const exportVars = document.getElementById('exportVars');
+    const addPaletteBtn = document.getElementById('addPalette');
+    const clearPaletteBtn = document.getElementById('clearPalette');
+    const contrastCheckBtn = document.getElementById('contrastCheck');
+    const contrastResult = document.getElementById('contrastResult');
+
+    // Init quick swatches
+    const common = ['#000000','#ffffff','#ff0000','#00ff00','#0000ff','#ffff00','#ff00ff','#00ffff','#0ea5a4','#111827'];
+    function initQuick(){
+      quickSwatches.innerHTML = '';
+      common.forEach(c=>{
+        const d = document.createElement('div'); d.className='swatch'; d.style.background=c; d.title=c;
+        d.addEventListener('click', ()=>{ setColor(c); }); quickSwatches.appendChild(d);
+      });
+    }
+
+    // Palette storage (in memory; could be localStorage)
+    let palette = [];
+    function renderPalette(){
+      paletteEl.innerHTML='';
+      palette.forEach((c,idx)=>{
+        const d = document.createElement('div'); d.className='swatch'; d.style.background=c; d.title=c;
+        d.addEventListener('click', ()=>{ navigator.clipboard.writeText(c).then(()=> alert('Copied '+c)); });
+        const del = document.createElement('button'); del.textContent='✕'; del.style.marginLeft='6px'; del.style.fontSize='11px'; del.style.border='none'; del.style.background='rgba(255,255,255,0.6)'; del.style.borderRadius='6px'; del.addEventListener('click',(e)=>{ e.stopPropagation(); palette.splice(idx,1); renderPalette(); });
+        const wrap = document.createElement('div'); wrap.style.position='relative'; wrap.appendChild(d); wrap.appendChild(del); paletteEl.appendChild(wrap);
+      });
+    }
+
+    function setColor(hex){
+      colorInput.value = hex;
+      updateFromHex(hex);
+    }
+
+    function updateFromHex(hex){
+      if(!hex.startsWith('#')) hex = '#'+hex;
+      hex = hex.length===4 ? '#'+hex[1]+hex[1]+hex[2]+hex[2]+hex[3]+hex[3] : hex;
+      hexEl.value = hex.toLowerCase();
+      const {r,g,b} = hexToRgb(hex);
+      rgbEl.value = `rgb(${r}, ${g}, ${b})`;
+      const hsl = rgbToHsl(r,g,b);
+      hslEl.value = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+      previewBox.style.background = hex;
+      updateCssOut(hex, r,g,b, hsl);
+    }
+
+    function updateCssOut(hex, r,g,b, hsl){
+      cssOut.textContent = `--color-primary: ${hex};\n--color-primary-rgb: ${r}, ${g}, ${b};\n--color-primary-hsl: ${hsl.h}, ${hsl.s}%, ${hsl.l}%;`;
+    }
+
+    // Events
+    colorInput.addEventListener('input', (e)=>{ updateFromHex(e.target.value); });
+    hexEl.addEventListener('change', ()=>{ updateFromHex(hexEl.value); });
+
+    addPaletteBtn.addEventListener('click', ()=>{ const c = hexEl.value || colorInput.value; if(!palette.includes(c)) palette.push(c); renderPalette(); });
+    clearPaletteBtn.addEventListener('click', ()=>{ if(confirm('Clear palette?')){ palette=[]; renderPalette(); } });
+
+    copyCssBtn.addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(cssOut.textContent); alert('CSS variables copied'); }catch(e){ alert('Copy failed — allow clipboard access'); } });
+    exportVars.addEventListener('click', ()=>{ const blob = new Blob([`:root{\n${cssOut.textContent}\n}`], {type:'text/css'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='colors.css'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); });
+
+    contrastCheckBtn.addEventListener('click', ()=>{
+      const hex = hexEl.value; const fg = {r:255,g:255,b:255}; const bg = hexToRgb(hex);
+      const ratio1 = contrastRatio(fg,bg); // white on color
+      const ratio2 = contrastRatio({r:0,g:0,b:0}, bg); // black on color
+      let best = ratio1>ratio2 ? {color:'white',ratio:ratio1} : {color:'black',ratio:ratio2};
+      const passAA = best.ratio>=4.5; const passLarge = best.ratio>=3;
+      contrastResult.innerHTML = `Best foreground: <b>${best.color}</b> — Contrast ratio: <b>${best.ratio}</b>. AA (normal text): <b>${passAA? 'PASS':'FAIL'}</b>, AA (large text): <b>${passLarge? 'PASS':'FAIL'}</b>`;
+    });
+
+    // Init
+    initQuick(); updateFromHex(colorInput.value); renderPalette();
+  </script>
+</body>
+</html>

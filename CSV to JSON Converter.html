@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Free CSV to JSON Converter - Convert CSV files into JSON format instantly. Easy-to-use tool for developers, students, and data analysts.">
+  <meta name="keywords" content="CSV to JSON, Convert CSV, JSON Converter, Free Tool, Data Conversion">
+  <title>CSV to JSON Converter | Free Online Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #4CAF50;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>CSV to JSON Converter</h1>
+    <p>Convert CSV files into JSON format quickly and easily</p>
+  </header>
+
+  <div class="container">
+    <h2>About This Tool</h2>
+    <p>The <strong>CSV to JSON Converter</strong> helps you transform CSV data into JSON format instantly. 
+    This tool is perfect for developers, students, and data analysts working with structured data.</p>
+
+    <h2>Enter CSV Data</h2>
+    <textarea id="csvInput" placeholder="Paste your CSV data here..."></textarea>
+    <button onclick="convertToJSON()">Convert to JSON</button>
+
+    <h2>Converted JSON Output</h2>
+    <pre id="jsonOutput"></pre>
+  </div>
+
+  <script>
+    function convertToJSON() {
+      const csv = document.getElementById('csvInput').value.trim();
+      if (!csv) {
+        alert("Please enter CSV data.");
+        return;
+      }
+
+      const lines = csv.split("\n");
+      const headers = lines[0].split(",");
+      const result = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const obj = {};
+        const currentLine = lines[i].split(",");
+        headers.forEach((header, index) => {
+          obj[header.trim()] = currentLine[index] ? currentLine[index].trim() : "";
+        });
+        result.push(obj);
+      }
+
+      document.getElementById('jsonOutput').textContent = JSON.stringify(result, null, 2);
+    }
+  </script>
+</body>
+</html>

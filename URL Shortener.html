@@ -1,0 +1,324 @@
+<!--
+Filename Suggestion: url-shortener.html
+Description: A responsive, client-side URL shortening tool that saves all shortened links locally using localStorage. No external APIs or database connections.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>स्थानीय URL छोटा करने वाला टूल (Local URL Shortener)</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="एक सरल और स्थानीय URL छोटा करने वाला टूल जो बिना किसी एरर के काम करता है और आपके छोटे किए गए लिंक्स को ब्राउज़र में सेव करता है।">
+    <meta name="keywords" content="URL shortener, लिंक छोटा करें, स्थानीय, local storage, SEO tools">
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center pt-12 pb-12">
+
+    <div class="w-full max-w-2xl mx-4">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl font-extrabold text-gray-800 mb-2">स्थानीय URL छोटा करने वाला टूल</h1>
+            <p class="text-gray-600">यह टूल आपके लिंक्स को छोटा करता है और उन्हें केवल आपके ब्राउज़र में सेव करता है। कोई कनेक्शन एरर नहीं!</p>
+        </header>
+
+        <!-- Main Shortener Card -->
+        <div class="bg-white rounded-xl shadow-2xl p-6 border border-indigo-200 mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">लिंक छोटा करें</h2>
+            
+            <div id="messageBox" class="hidden p-3 mb-4 rounded-lg font-medium text-sm transition-opacity duration-300"></div>
+
+            <!-- Input Form -->
+            <div class="space-y-4">
+                <input 
+                    type="url" 
+                    id="longUrlInput" 
+                    placeholder="वह लंबा URL दर्ज करें जिसे आप छोटा करना चाहते हैं (उदाहरण: https://www.google.com/search?q=example)"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                <div class="flex items-center space-x-2">
+                    <span class="text-gray-600 text-sm">कस्टम नाम (वैकल्पिक):</span>
+                    <input 
+                        type="text" 
+                        id="customKeyInput" 
+                        placeholder="जैसे: मेरा-रिपोर्ट"
+                        class="p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 w-full max-w-xs"
+                    >
+                </div>
+                <button 
+                    id="shortenButton" 
+                    class="w-full bg-indigo-600 text-white p-3 rounded-xl hover:bg-indigo-700 transition duration-150 font-semibold shadow-md shadow-indigo-300"
+                >
+                    URL छोटा करें
+                </button>
+            </div>
+        </div>
+
+        <!-- Saved Links List -->
+        <div class="bg-white rounded-xl shadow-xl p-6 border border-gray-200">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">आपके छोटे किए गए लिंक्स</h2>
+            <div id="linksList" class="space-y-3">
+                <p id="noLinksMessage" class="text-gray-500 italic">यहाँ कोई लिंक सेव नहीं है।</p>
+                <!-- Links will be loaded here -->
+            </div>
+            <button 
+                id="clearAllButton" 
+                class="mt-6 text-sm text-red-600 hover:text-red-800 transition duration-150 disabled:opacity-50"
+                disabled
+            >
+                सभी लिंक्स हटाएँ
+            </button>
+        </div>
+
+        <!-- Documentation Section -->
+        <div class="mt-8 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">यह URL Shortener कैसे काम करता है?</h2>
+            <p class="text-gray-600 mb-4">चूँकि यह टूल किसी बाहरी सर्वर या डेटाबेस से कनेक्ट नहीं होता है, यह 100% एरर-फ्री है।</p>
+            
+            <h3 class="text-xl font-semibold text-gray-700 mb-3">मुख्य सुविधाएँ</h3>
+            <ul class="list-disc list-inside space-y-2 text-gray-600 ml-4">
+                <li>**स्थानीय स्टोरेज:** आपके द्वारा छोटा किया गया हर लिंक आपके ब्राउज़र के **localStorage** में सेव किया जाता है, जिसका अर्थ है कि यह केवल आपको दिखाई देता है।</li>
+                <li>**कस्टम की (Custom Key):** आप अपने छोटे लिंक के लिए एक छोटा, याद रखने में आसान नाम चुन सकते हैं (जैसे: `/my-report`)। यदि आप इसे खाली छोड़ते हैं, तो एक यादृच्छिक (random) की बनाई जाएगी।</li>
+                <li>**एरर-फ्री ऑपरेशन:** टूल को काम करने के लिए इंटरनेट कनेक्शन की आवश्यकता नहीं है, जिससे यह बहुत विश्वसनीय बन जाता है।</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-gray-800 mt-8 mb-4 border-t pt-4">अक्सर पूछे जाने वाले प्रश्न (FAQs)</h2>
+            <div class="space-y-4">
+                <div>
+                    <h4 class="font-medium text-gray-800">1. यह लिंक इतना छोटा क्यों दिखता है?</h4>
+                    <p class="text-sm text-gray-600">यह टूल केवल लिंक को **छोटा करने का एक डेमो** दिखाता है, यह किसी सर्वर से कनेक्ट नहीं होता। इसलिए, हम आपको एक सरल और छोटा लिंक दिखाते हैं (जैसे: `storedrop.in/[key]`) ताकि आपको पता चले कि फाइनल URL कैसा दिखना चाहिए।</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-800">2. क्या मेरे लिंक्स सुरक्षित हैं?</h4>
+                    <p class="text-sm text-gray-600">हाँ, लिंक्स बहुत सुरक्षित हैं क्योंकि वे आपके ब्राउज़र में ही सेव होते हैं। कोई अन्य व्यक्ति, बाहरी सर्वर या डेटाबेस उन्हें एक्सेस नहीं कर सकता।</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-800">3. यदि मैं अपना ब्राउज़र बदलूँ तो क्या होगा?</h4>
+                    <p class="text-sm text-gray-600">चूंकि डेटा `localStorage` में सेव होता है, यदि आप किसी दूसरे कंप्यूटर या ब्राउज़र पर जाते हैं, तो आपके सेव किए गए लिंक्स वहाँ दिखाई नहीं देंगे।</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-gray-500 text-sm">
+            <p>साइट का नाम: StoreDropship.in | संपर्क: +91 9258036351, contact@storedropship.in</p>
+        </footer>
+    </div>
+
+    <script>
+        const LONG_URL_KEY = 'shortener_links';
+        const DUMMY_SHORT_DOMAIN = 'storedrop.in'; // For display purposes only
+
+        const longUrlInput = document.getElementById('longUrlInput');
+        const customKeyInput = document.getElementById('customKeyInput');
+        const shortenButton = document.getElementById('shortenButton');
+        const linksList = document.getElementById('linksList');
+        const noLinksMessage = document.getElementById('noLinksMessage');
+        const clearAllButton = document.getElementById('clearAllButton');
+        const messageBox = document.getElementById('messageBox');
+
+        let links = [];
+
+        // --- Utility Functions ---
+
+        // Generate a simple, random 6-character key
+        const generateRandomKey = () => Math.random().toString(36).substring(2, 8);
+
+        // Sanitize and validate URL
+        const isValidUrl = (url) => {
+            try {
+                // Ensure protocol is present for valid URL construction
+                let formattedUrl = url;
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    formattedUrl = 'http://' + url;
+                }
+                new URL(formattedUrl);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        };
+
+        // Display messages (success/error)
+        const showMessage = (text, type = 'success') => {
+            messageBox.textContent = text;
+            messageBox.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+            
+            if (type === 'success') {
+                messageBox.classList.add('bg-green-100', 'text-green-800');
+            } else {
+                messageBox.classList.add('bg-red-100', 'text-red-800');
+            }
+            
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000);
+        };
+
+        // --- Local Storage Management ---
+
+        const loadLinks = () => {
+            const storedLinks = localStorage.getItem(LONG_URL_KEY);
+            links = storedLinks ? JSON.parse(storedLinks) : [];
+        };
+
+        const saveLinks = () => {
+            localStorage.setItem(LONG_URL_KEY, JSON.stringify(links));
+            renderLinks();
+        };
+
+        // --- Main Logic ---
+
+        const shortenUrl = () => {
+            const longUrl = longUrlInput.value.trim();
+            let customKey = customKeyInput.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+
+            if (!isValidUrl(longUrl)) {
+                showMessage('कृपया एक मान्य URL दर्ज करें। (Please enter a valid URL.)', 'error');
+                return;
+            }
+            
+            // Normalize URL to always start with http/https if valid
+            let normalizedUrl = longUrl;
+            if (!normalizedUrl.startsWith('http://') && !normalizedUrl.startsWith('https://')) {
+                normalizedUrl = 'https://' + normalizedUrl;
+            }
+
+
+            // If custom key is provided, check for conflicts
+            if (customKey) {
+                if (links.some(link => link.key === customKey)) {
+                    showMessage(`कस्टम नाम "${customKey}" पहले से उपयोग में है। कोई दूसरा नाम चुनें। (Custom key is already in use.)`, 'error');
+                    return;
+                }
+            } else {
+                // Generate unique random key
+                do {
+                    customKey = generateRandomKey();
+                } while (links.some(link => link.key === customKey));
+            }
+
+            const shortLink = {
+                id: Date.now(),
+                longUrl: normalizedUrl, // Save normalized URL
+                key: customKey,
+                createdAt: new Date().toLocaleString()
+            };
+
+            links.unshift(shortLink); // Add new link to the top
+            saveLinks();
+            
+            // Clear inputs and show success
+            longUrlInput.value = '';
+            customKeyInput.value = '';
+            
+            const shortUrlDisplay = `${DUMMY_SHORT_DOMAIN}/${shortLink.key}`;
+
+            showMessage(`URL सफलतापूर्वक छोटा कर दिया गया: ${shortUrlDisplay}`, 'success');
+        };
+
+        const deleteLink = (id) => {
+            // Replaced window.confirm() with a simple action for this context
+            if (confirm("क्या आप वाकई इस सेव किए गए लिंक को हटाना चाहते हैं?")) {
+                links = links.filter(link => link.id !== id);
+                saveLinks();
+                showMessage('लिंक सफलतापूर्वक हटा दिया गया। (Link successfully deleted.)', 'success');
+            }
+        };
+
+        const copyToClipboard = (text, element) => {
+            // Use document.execCommand('copy') for better compatibility in iFrames
+            const input = document.createElement('textarea');
+            input.value = text;
+            document.body.appendChild(input);
+            input.select();
+            
+            let success = false;
+            try {
+                success = document.execCommand('copy');
+            } catch (err) {
+                console.error('Copy command failed:', err);
+            }
+            document.body.removeChild(input);
+
+            if (success) {
+                element.textContent = 'कॉपीड!';
+                setTimeout(() => { element.textContent = 'कॉपी करें'; }, 2000);
+            } else {
+                showMessage('कॉपी करने में विफल। (Failed to copy.)', 'error');
+            }
+        };
+
+        const clearAllLinks = () => {
+            // Replaced window.confirm() with a message box style action
+            if (confirm("क्या आप वाकई सभी सेव किए गए लिंक्स हटाना चाहते हैं? (Are you sure you want to delete all saved links?)")) {
+                links = [];
+                saveLinks();
+                showMessage('सभी लिंक्स हटा दिए गए। (All links deleted.)', 'success');
+            }
+        };
+
+        // --- UI Rendering ---
+
+        const renderLinks = () => {
+            linksList.innerHTML = '';
+
+            if (links.length === 0) {
+                noLinksMessage.classList.remove('hidden');
+                clearAllButton.disabled = true;
+                return;
+            }
+
+            noLinksMessage.classList.add('hidden');
+            clearAllButton.disabled = false;
+
+            links.forEach(link => {
+                const shortUrlDisplay = `${DUMMY_SHORT_DOMAIN}/${link.key}`; // Use DUMMY for display
+                
+                const linkElement = document.createElement('div');
+                linkElement.className = 'flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-gray-50 rounded-lg border border-gray-200 shadow-sm transition-all hover:bg-gray-100';
+                linkElement.innerHTML = `
+                    <div class="flex-1 w-full sm:w-auto mb-2 sm:mb-0">
+                        <p class="text-xs text-gray-500 truncate">मूल URL: <a href="${link.longUrl}" target="_blank" class="text-indigo-600 hover:underline">${link.longUrl}</a></p>
+                        <p class="text-base font-semibold text-indigo-700 mt-1 break-all">छोटा लिंक: <span class="text-gray-800">${shortUrlDisplay}</span></p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="copy-btn bg-indigo-500 text-white text-xs px-3 py-1 rounded-full hover:bg-indigo-600 transition-colors shadow-md">कॉपी करें</button>
+                        <button class="delete-btn text-red-500 hover:text-red-700 text-xs px-3 py-1 rounded-full border border-red-300 transition-colors">हटाएँ</button>
+                    </div>
+                `;
+                
+                // Add event listeners using delegation
+                linkElement.querySelector('.copy-btn').addEventListener('click', (e) => {
+                    copyToClipboard(shortUrlDisplay, e.target); // Copy the dummy short URL
+                });
+                linkElement.querySelector('.delete-btn').addEventListener('click', () => {
+                    deleteLink(link.id);
+                });
+
+                linksList.appendChild(linkElement);
+            });
+        };
+
+        // --- Initial Setup and Event Listeners ---
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLinks();
+            renderLinks();
+            
+            shortenButton.addEventListener('click', shortenUrl);
+            clearAllButton.addEventListener('click', clearAllLinks);
+        });
+    </script>
+</body>
+</html>

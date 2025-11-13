@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPF Calculator - India</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .input-group {
+            transition: all 0.3s ease;
+        }
+        .input-group:hover {
+            transform: translateY(-2px);
+        }
+        .result-highlight {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+        .lang-selector {
+            position: relative;
+        }
+        .lang-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 100;
+            min-width: 150px;
+            display: none;
+        }
+        .lang-dropdown.show {
+            display: block;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-piggy-bank text-3xl"></i>
+                    <h1 class="text-2xl md:text-3xl font-bold" data-i18n="header.title">PPF Calculator</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm md:text-base">
+                        <i class="fas fa-flag mr-2"></i><span data-i18n="header.country">India</span>
+                    </div>
+                    <div class="lang-selector">
+                        <button id="langButton" class="flex items-center space-x-2 bg-white bg-opacity-20 hover:bg-opacity-30 px-3 py-1 rounded-lg transition">
+                            <i class="fas fa-globe"></i>
+                            <span id="currentLang">EN</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="langDropdown" class="lang-dropdown">
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100" data-lang="en">English</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100" data-lang="hi">हिन्दी</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100" data-lang="bn">বাংলা</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100" data-lang="ta">தமிழ்</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100" data-lang="te">తెలుగు</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- PPF Details Section -->
+        <section class="mb-8">
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <h2 class="text-xl font-semibold mb-6 flex items-center">
+                    <i class="fas fa-chart-line mr-3 text-purple-600"></i>
+                    <span data-i18n="ppf.title">PPF Investment Details</span>
+                </h2>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Annual Investment -->
+                    <div class="input-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-rupee-sign mr-2"></i><span data-i18n="ppf.annualInvestment">Annual Investment (₹)</span>
+                        </label>
+                        <input type="number" id="annualInvestment" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="150000" value="150000" max="150000">
+                    </div>
+
+                    <!-- Interest Rate -->
+                    <div class="input-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-percentage mr-2"></i><span data-i18n="ppf.interestRate">Interest Rate (% per annum)</span>
+                        </label>
+                        <input type="number" id="interestRate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="7.1" value="7.1" step="0.1">
+                    </div>
+
+                    <!-- Investment Period -->
+                    <div class="input-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-calendar-alt mr-2"></i><span data-i18n="ppf.period">Investment Period (Years)</span>
+                        </label>
+                        <input type="number" id="investmentPeriod" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="15" value="15" min="15" max="50">
+                    </div>
+                </div>
+
+                <!-- Calculate Button -->
+                <div class="text-center mt-6">
+                    <button onclick="calculatePPF()" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3 rounded-lg font-semibold text-lg hover:from-purple-700 hover:to-indigo-700 transform transition hover:scale-105 shadow-lg">
+                        <i class="fas fa-calculator mr-2"></i><span data-i18n="calculateBtn">Calculate PPF</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="resultsSection" class="hidden mb-8">
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- PPF Results -->
+                <div class="bg-white rounded-lg card-shadow p-6">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fas fa-trophy mr-3 text-purple-600"></i>
+                        <span data-i18n="results.title">Maturity Details</span>
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between py-2 border-b">
+                            <span class="text-gray-600"><span data-i18n="results.totalInvestment">Total Investment</span>:</span>
+                            <span class="font-semibold" id="totalInvestment">₹0</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b">
+                            <span class="text-gray-600"><span data-i18n="results.totalInterest">Total Interest</span>:</span>
+                            <span class="font-semibold" id="totalInterest">₹0</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b">
+                            <span class="text-gray-600"><span data-i18n="results.maturityValue">Maturity Value</span>:</span>
+                            <span class="font-semibold text-lg" id="maturityValue">₹0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Growth Chart -->
+                <div class="bg-white rounded-lg card-shadow p-6">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fas fa-chart-area mr-3 text-purple-600"></i>
+                        <span data-i18n="chart.title">PPF Growth</span>
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="ppfChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Yearly Breakup Table -->
+        <section id="yearlyBreakup" class="hidden">
+            <div class="bg-white rounded-lg card-shadow p-6 overflow-x-auto">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-table mr-3 text-purple-600"></i>
+                    <span data-i18n="table.title">Yearly Growth Breakup</span>
+                </h3>
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="table.year">Year</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="table.investment">Investment</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="table.interest">Interest</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="table.balance">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="yearlyBreakupBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Table rows will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-sm">
+                <i class="fas fa-info-circle mr-2"></i>
+                <span data-i18n="footer.note">Note: This calculator provides only estimated calculations. PPF interest rates are subject to change as per government notifications.</span>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Translations for different languages
+        const translations = {
+            en: {
+                "header.title": "PPF Calculator",
+                "header.country": "India",
+                "ppf.title": "PPF Investment Details",
+                "ppf.annualInvestment": "Annual Investment (₹)",
+                "ppf.interestRate": "Interest Rate (% per annum)",
+                "ppf.period": "Investment Period (Years)",
+                "calculateBtn": "Calculate PPF",
+                "results.title": "Maturity Details",
+                "results.totalInvestment": "Total Investment",
+                "results.totalInterest": "Total Interest",
+                "results.maturityValue": "Maturity Value",
+                "chart.title": "PPF Growth",
+                "table.title": "Yearly Growth Breakup",
+                "table.year": "Year",
+                "table.investment": "Investment",
+                "table.interest": "Interest",
+                "table.balance": "Balance",
+                "footer.note": "Note: This calculator provides only estimated calculations. PPF interest rates are subject to change as per government notifications."
+            },
+            hi: {
+                "header.title": "पीपीएफ कैलकुलेटर",
+                "header.country": "भारत",
+                "ppf.title": "पीपीएफ निवेश विवरण",
+                "ppf.annualInvestment": "वार्षिक निवेश (₹)",
+                "ppf.interestRate": "ब्याज दर (% प्रति वर्ष)",
+                "ppf.period": "निवेश अवधि (वर्ष)",
+                "calculateBtn": "पीपीएफ कैलकुलेट करें",
+                "results.title": "परिपक्वता विवरण",
+                "results.totalInvestment": "कुल निवेश",
+                "results.totalInterest": "कुल ब्याज",
+                "results.maturityValue": "परिपक्वता मूल्य",
+                "chart.title": "पीपीएफ वृद्धि",
+                "table.title": "वार्षिक वृद्धि विवरण",
+                "table.year": "वर्ष",
+                "table.investment": "निवेश",
+                "table.interest": "ब्याज",
+                "table.balance": "शेष राशि",
+                "footer.note": "नोट: यह कैलकुलेटर केवल अनुमानित गणना प्रदान करता है। पीपीएफ ब्याज दरें सरकारी अधिसूचनाओं के अनुसार बदल सकती हैं।"
+            },
+            bn: {
+                "header.title": "পিপিএফ ক্যালকুলেটর",
+                "header.country": "ভারত",
+                "ppf.title": "পিপিএফ বিনিয়োগের বিবরণ",
+                "ppf.annualInvestment": "বার্ষিক বিনিয়োগ (₹)",
+                "ppf.interestRate": "সুদের হার (% প্রতি বছর)",
+                "ppf.period": "বিনিয়োগের মেয়াদ (বছর)",
+                "calculateBtn": "পিপিএফ গণনা করুন",
+                "results.title": "পরিপক্কতার বিবরণ",
+                "results.totalInvestment": "মোট বিনিয়োগ",
+                "results.totalInterest": "মোট সুদ",
+                "results.maturityValue": "পরিপক্কতার মূল্য",
+                "chart.title": "পিপিএফ বৃদ্ধি",
+                "table.title": "বার্ষিক বৃদ্ধি ব্রেকআপ",
+                "table.year": "বছর",
+                "table.investment": "বিনিয়োগ",
+                "table.interest": "সুদ",
+                "table.balance": "ব্যালেন্স",
+                "footer.note": "নোট: এই ক্যালকুলেটর শুধুমাত্র আনুমানিক গণনা প্রদান করে। পিপিএফ সুদের হার সরকারি বিজ্ঞপ্তি অনুযায়ী পরিবর্তিত হতে পারে।"
+            },
+            ta: {
+                "header.title": "பிபிஎஃப் கணக்கீடு",
+                "header.country": "இந்தியா",
+                "ppf.title": "பிபிஎஃப் முதலீட்டு விவரங்கள்",
+                "ppf.annualInvestment": "ஆண்டு முதலீடு (₹)",
+                "ppf.interestRate": "வட்டி விகிதம் (% ஆண்டுக்கு)",
+                "ppf.period": "முதலீட்டு காலம் (ஆண்டுகள்)",
+                "calculateBtn": "பிபிஎஃப் கணக்கிடுங்கள்",
+                "results.title": "மென்மை விவரங்கள்",
+                "results.totalInvestment": "மொத்த முதலீடு",
+                "results.totalInterest": "மொத்த வட்டி",
+                "results.maturityValue": "மென்மை மதிப்பு",
+                "chart.title": "பிபிஎஃப் வளர்ச்சி",
+                "table.title": "ஆண்டு வளர்ச்சி விவரங்கள்",
+                "table.year": "ஆண்டு",
+                "table.investment": "முதலீடு",
+                "table.interest": "வட்டி",
+                "table.balance": "இருப்பு",
+                "footer.note": "குறிப்பு: இந்த கணக்கீடு மட்டுமே மதிப்பீட்டு கணக்கீடுகளை வழங்குகிறது. பிபிஎஃப் வட்டி விகிதங்கள் அரசு அறிவிப்புகளின்படி மாறலாம்."
+            },
+            te: {
+                "header.title": "పిపిఎఫ్ క్యాలిక్యులేటర్",
+                "header.country": "భారతదేశం",
+                "ppf.title": "పిపిఎఫ్ పెట్టుబడి వివరాలు",
+                "ppf.annualInvestment": "వార్షిక పెట్టుబడి (₹)",
+                "ppf.interestRate": "వడ్డీ రేటు (% సంవత్సరానికి)",
+                "ppf.period": "పెట్టుబడి కాలం (సంవత్సరాలు)",
+                "calculateBtn": "పిపిఎఫ్ లెక్కించండి",
+                "results.title": "పరిపక్వత వివరాలు",
+                "results.totalInvestment": "మొత్తం పెట్టుబడి",
+                "results.totalInterest": "మొత్తం వడ్డీ",
+                "results.maturityValue": "పరిపక్వత విలువ",
+                "chart.title": "పిపిఎఫ్ వృద్ధి",
+                "table.title": "వార్షిక వృద్ధి వివరాలు",
+                "table.year": "సంవత్సరం",
+                "table.investment": "పెట్టుబడి",
+                "table.interest": "వడ్డీ",
+                "table.balance": "బ్యాలెన్స్",
+                "footer.note": "గమనిక: ఈ క్యాలిక్యులేటర్ అంచనా లెక్కలను మాత్రమే అందిస్తుంది. పిపిఎఫ్ వడ్డీ రేట్లు ప్రభుత్వ నోటిఫికేషన్ల ప్రకారం మారవచ్చు."
+            }
+        };
+
+        // Current language
+        let currentLanguage = 'en';
+
+        // Language selector functionality
+        document.getElementById('langButton').addEventListener('click', function() {
+            document.getElementById('langDropdown').classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', function(event) {
+            if (!event.target.matches('#langButton') && !event.target.closest('#langButton')) {
+                document.getElementById('langDropdown').classList.remove('show');
+            }
+        });
+
+        // Language selection
+        document.querySelectorAll('#langDropdown a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const lang = this.getAttribute('data-lang');
+                setLanguage(lang);
+                document.getElementById('langDropdown').classList.remove('show');
+            });
+        });
+
+        // Function to set language
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.getElementById('currentLang').textContent = lang.toUpperCase();
+            
+            // Update all elements with data-i18n attribute
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+
+            // Store language preference
+            localStorage.setItem('preferredLanguage', lang);
+        }
+
+        // Load saved language preference
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedLang = localStorage.getItem('preferredLanguage');
+            if (savedLang && translations[savedLang]) {
+                setLanguage(savedLang);
+            }
+        });
+
+        // PPF Calculation
+        let ppfChart = null;
+
+        function calculatePPF() {
+            // Get input values
+            const annualInvestment = parseFloat(document.getElementById('annualInvestment').value) || 0;
+            const rate = parseFloat(document.getElementById('interestRate').value) || 0;
+            const period = parseFloat(document.getElementById('investmentPeriod').value) || 0;
+
+            // Calculate PPF maturity value
+            let balance = 0;
+            const yearlyData = [];
+
+            for (let year = 1; year <= period; year++) {
+                // Add annual investment at the beginning of the year
+                balance += annualInvestment;
+                
+                // Calculate interest for the year
+                const interest = balance * (rate / 100);
+                
+                // Add interest to balance
+                balance += interest;
+                
+                // Store yearly data
+                yearlyData.push({
+                    year: year,
+                    investment: annualInvestment,
+                    interest: interest,
+                    balance: balance
+                });
+            }
+
+            // Calculate totals
+            const totalInvestment = annualInvestment * period;
+            const totalInterest = balance - totalInvestment;
+
+            // Display results
+            document.getElementById('totalInvestment').textContent = formatCurrency(totalInvestment);
+            document.getElementById('totalInterest').textContent = formatCurrency(totalInterest);
+            document.getElementById('maturityValue').textContent = formatCurrency(balance);
+
+            // Show results section
+            document.getElementById('resultsSection').classList.remove('hidden');
+
+            // Create growth chart
+            createGrowthChart(yearlyData);
+
+            // Generate yearly breakup table
+            generateYearlyBreakup(yearlyData);
+        }
+
+        function createGrowthChart(yearlyData) {
+            const ctx = document.getElementById('ppfChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (ppfChart) {
+                ppfChart.destroy();
+            }
+
+            // Prepare data for chart
+            const labels = yearlyData.map(d => `Year ${d.year}`);
+            const balanceData = yearlyData.map(d => d.balance);
+
+            // Create new chart
+            ppfChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'PPF Balance',
+                        data: balanceData,
+                        backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                        pointBorderColor: '#fff',
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Balance: ${formatCurrency(context.raw)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return formatCurrency(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateYearlyBreakup(yearlyData) {
+            const yearlyBreakupBody = document.getElementById('yearlyBreakupBody');
+            yearlyBreakupBody.innerHTML = '';
+
+            yearlyData.forEach(data => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${data.year}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatCurrency(data.investment)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatCurrency(data.interest)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatCurrency(data.balance)}</td>
+                `;
+                
+                yearlyBreakupBody.appendChild(row);
+            });
+
+            // Show yearly breakup section
+            document.getElementById('yearlyBreakup').classList.remove('hidden');
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Add input validation
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value < 0) this.value = 0;
+                if (this.id === 'annualInvestment' && this.value > 150000) this.value = 150000;
+                if (this.id === 'investmentPeriod' && this.value < 15) this.value = 15;
+                if (this.id === 'investmentPeriod' && this.value > 50) this.value = 50;
+            });
+        });
+    </script>
+</body>
+</html>

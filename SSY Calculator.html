@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSY Calculator - India</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .input-group {
+            transition: all 0.3s ease;
+        }
+        .input-group:hover {
+            transform: translateY(-2px);
+        }
+        .result-highlight {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+        .lang-selector {
+            position: relative;
+        }
+        .lang-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 100;
+            min-width: 150px;
+            display: none;
+        }
+        .lang-dropdown.show {
+            display: block;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-child text-3xl"></i>
+                    <h1 class="text-2xl md:text-3xl font-bold" data-i18n="header.title">SSY Calculator</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm md:text-base">
+                        <i class="fas fa-flag mr-2"></i><span data-i18n="header.country">India</span>
+                    </div>
+                    <div class="lang-selector">
+                        <button id="langButton" class="flex items-center space-x-2 bg-white bg-opacity-20 hover:bg-opacity-30 px-3 py-1 rounded-lg transition">
+                            <i class="fas fa-globe"></i>
+                            <span id="currentLang">EN</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="langDropdown" class="lang-dropdown">
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100" data-lang="en">English</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100" data-lang="hi">हिन्दी</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100" data-lang="bn">বাংলা</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100" data-lang="ta">தமிழ்</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100" data-lang="te">తెలుగు</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- SSY Details Section -->
+        <section class="mb-8">
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <h2 class="text-xl font-semibold mb-6 flex items-center">
+                    <i class="fas fa-female mr-3 text-purple-600"></i>
+                    <span data-i18n="ssy.title">Sukanya Samriddhi Yojana Details</span>
+                </h2>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Annual Investment -->
+                    <div class="input-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-rupee-sign mr-2"></i><span data-i18n="ssy.annualInvestment">Annual Investment (₹)</span>
+                        </label>
+                        <input type="number" id="annualInvestment" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="250000" value="250000" max="250000">
+                    </div>
+
+                    <!-- Interest Rate -->
+                    <div class="input-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-percentage mr-2"></i><span data-i18n="ssy.interestRate">Interest Rate (% per annum)</span>
+                        </label>
+                        <input type="number" id="interestRate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="8.2" value="8.2" step="0.1">
+                    </div>
+
+                    <!-- Girl's Age -->
+                    <div class="input-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-birthday-cake mr-2"></i><span data-i18n="ssy.girlAge">Girl's Age (Years)</span>
+                        </label>
+                        <input type="number" id="girlAge" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="5" value="5" min="1" max="10">
+                    </div>
+                </div>
+
+                <!-- Calculate Button -->
+                <div class="text-center mt-6">
+                    <button onclick="calculateSSY()" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3 rounded-lg font-semibold text-lg hover:from-purple-700 hover:to-indigo-700 transform transition hover:scale-105 shadow-lg">
+                        <i class="fas fa-calculator mr-2"></i><span data-i18n="calculateBtn">Calculate SSY</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="resultsSection" class="hidden mb-8">
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- SSY Results -->
+                <div class="bg-white rounded-lg card-shadow p-6">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fas fa-trophy mr-3 text-purple-600"></i>
+                        <span data-i18n="results.title">Maturity Details</span>
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between py-2 border-b">
+                            <span class="text-gray-600"><span data-i18n="results.totalInvestment">Total Investment</span>:</span>
+                            <span class="font-semibold" id="totalInvestment">₹0</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b">
+                            <span class="text-gray-600"><span data-i18n="results.totalInterest">Total Interest</span>:</span>
+                            <span class="font-semibold" id="totalInterest">₹0</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b">
+                            <span class="text-gray-600"><span data-i18n="results.maturityValue">Maturity Value</span>:</span>
+                            <span class="font-semibold text-lg" id="maturityValue">₹0</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b">
+                            <span class="text-gray-600"><span data-i18n="results.maturityAge">Maturity Age</span>:</span>
+                            <span class="font-semibold" id="maturityAge">0 years</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Growth Chart -->
+                <div class="bg-white rounded-lg card-shadow p-6">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fas fa-chart-area mr-3 text-purple-600"></i>
+                        <span data-i18n="chart.title">SSY Growth</span>
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="ssyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Yearly Breakup Table -->
+        <section id="yearlyBreakup" class="hidden">
+            <div class="bg-white rounded-lg card-shadow p-6 overflow-x-auto">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-table mr-3 text-purple-600"></i>
+                    <span data-i18n="table.title">Yearly Growth Breakup</span>
+                </h3>
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="table.year">Year</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="table.investment">Investment</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="table.interest">Interest</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="table.balance">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="yearlyBreakupBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Table rows will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-sm">
+                <i class="fas fa-info-circle mr-2"></i>
+                <span data-i18n="footer.note">Note: This calculator provides only estimated calculations. SSY interest rates are subject to change as per government notifications.</span>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Translations for different languages
+        const translations = {
+            en: {
+                "header.title": "SSY Calculator",
+                "header.country": "India",
+                "ssy.title": "Sukanya Samriddhi Yojana Details",
+                "ssy.annualInvestment": "Annual Investment (₹)",
+                "ssy.interestRate": "Interest Rate (% per annum)",
+                "ssy.girlAge": "Girl's Age (Years)",
+                "calculateBtn": "Calculate SSY",
+                "results.title": "Maturity Details",
+                "results.totalInvestment": "Total Investment",
+                "results.totalInterest": "Total Interest",
+                "results.maturityValue": "Maturity Value",
+                "results.maturityAge": "Maturity Age",
+                "chart.title": "SSY Growth",
+                "table.title": "Yearly Growth Breakup",
+                "table.year": "Year",
+                "table.investment": "Investment",
+                "table.interest": "Interest",
+                "table.balance": "Balance",
+                "footer.note": "Note: This calculator provides only estimated calculations. SSY interest rates are subject to change as per government notifications."
+            },
+            hi: {
+                "header.title": "सुकन्या समृद्धि योजना कैलकुलेटर",
+                "header.country": "भारत",
+                "ssy.title": "सुकन्या समृद्धि योजना विवरण",
+                "ssy.annualInvestment": "वार्षिक निवेश (₹)",
+                "ssy.interestRate": "ब्याज दर (% प्रति वर्ष)",
+                "ssy.girlAge": "लड़की की उम्र (वर्ष)",
+                "calculateBtn": "एसएसवाई कैलकुलेट करें",
+                "results.title": "परिपक्वता विवरण",
+                "results.totalInvestment": "कुल निवेश",
+                "results.totalInterest": "कुल ब्याज",
+                "results.maturityValue": "परिपक्वता मूल्य",
+                "results.maturityAge": "परिपक्वता उम्र",
+                "chart.title": "एसएसवाई वृद्धि",
+                "table.title": "वार्षिक वृद्धि विवरण",
+                "table.year": "वर्ष",
+                "table.investment": "निवेश",
+                "table.interest": "ब्याज",
+                "table.balance": "शेष राशि",
+                "footer.note": "नोट: यह कैलकुलेटर केवल अनुमानित गणना प्रदान करता है। एसएसवाई ब्याज दरें सरकारी अधिसूचनाओं के अनुसार बदल सकती हैं।"
+            },
+            bn: {
+                "header.title": "সুকন্যা সমৃদ্ধি যোজনা ক্যালকুলেটর",
+                "header.country": "ভারত",
+                "ssy.title": "সুকন্যা সমৃদ্ধি যোজনার বিবরণ",
+                "ssy.annualInvestment": "বার্ষিক বিনিয়োগ (₹)",
+                "ssy.interestRate": "সুদের হার (% প্রতি বছর)",
+                "ssy.girlAge": "মেয়ের বয়স (বছর)",
+                "calculateBtn": "এসএসওয়াই গণনা করুন",
+                "results.title": "পরিপক্কতার বিবরণ",
+                "results.totalInvestment": "মোট বিনিয়োগ",
+                "results.totalInterest": "মোট সুদ",
+                "results.maturityValue": "পরিপক্কতার মূল্য",
+                "results.maturityAge": "পরিপক্কতার বয়স",
+                "chart.title": "এসএসওয়াই বৃদ্ধি",
+                "table.title": "বার্ষিক বৃদ্ধি ব্রেকআপ",
+                "table.year": "বছর",
+                "table.investment": "বিনিয়োগ",
+                "table.interest": "সুদ",
+                "table.balance": "ব্যালেন্স",
+                "footer.note": "নোট: এই ক্যালকুলেটর শুধুমাত্র আনুমানিক গণনা প্রদান করে। এসএসওয়াই সুদের হার সরকারি বিজ্ঞপ্তি অনুযায়ী পরিবর্তিত হতে পারে।"
+            },
+            ta: {
+                "header.title": "சுகன்யா சம்ருத்தி திட்ட கணக்கீடு",
+                "header.country": "இந்தியா",
+                "ssy.title": "சுகன்யா சம்ருத்தி திட்ட விவரங்கள்",
+                "ssy.annualInvestment": "ஆண்டு முதலீடு (₹)",
+                "ssy.interestRate": "வட்டி விகிதம் (% ஆண்டுக்கு)",
+                "ssy.girlAge": "பெண் வயது (ஆண்டுகள்)",
+                "calculateBtn": "எஸ்எஸ்ஒய் கணக்கிடுங்கள்",
+                "results.title": "மென்மை விவரங்கள்",
+                "results.totalInvestment": "மொத்த முதலீடு",
+                "results.totalInterest": "மொத்த வட்டி",
+                "results.maturityValue": "மென்மை மதிப்பு",
+                "results.maturityAge": "மென்மை வயது",
+                "chart.title": "எஸ்எஸ்ஒய் வளர்ச்சி",
+                "table.title": "ஆண்டு வளர்ச்சி விவரங்கள்",
+                "table.year": "ஆண்டு",
+                "table.investment": "முதலீடு",
+                "table.interest": "வட்டி",
+                "table.balance": "இருப்பு",
+                "footer.note": "குறிப்பு: இந்த கணக்கீடு மட்டுமே மதிப்பீட்டு கணக்கீடுகளை வழங்குகிறது. எஸ்எஸ்ஒய் வட்டி விகிதங்கள் அரசு அறிவிப்புகளின்படி மாறலாம்."
+            },
+            te: {
+                "header.title": "సుకన్యా సమృద్ధి యోజన క్యాలిక్యులేటర్",
+                "header.country": "భారతదేశం",
+                "ssy.title": "సుకన్యా సమృద్ధి యోజన వివరాలు",
+                "ssy.annualInvestment": "వార్షిక పెట్టుబడి (₹)",
+                "ssy.interestRate": "వడ్డీ రేటు (% సంవత్సరానికి)",
+                "ssy.girlAge": "అమ్మాయి వయస్సు (సంవత్సరాలు)",
+                "calculateBtn": "ఎస్ఎస్వై లెక్కించండి",
+                "results.title": "పరిపక్వత వివరాలు",
+                "results.totalInvestment": "మొత్తం పెట్టుబడి",
+                "results.totalInterest": "మొత్తం వడ్డీ",
+                "results.maturityValue": "పరిపక్వత విలువ",
+                "results.maturityAge": "పరిపక్వత వయస్సు",
+                "chart.title": "ఎస్ఎస్వై వృద్ధి",
+                "table.title": "వార్షిక వృద్ధి వివరాలు",
+                "table.year": "సంవత్సరం",
+                "table.investment": "పెట్టుబడి",
+                "table.interest": "వడ్డీ",
+                "table.balance": "బ్యాలెన్స్",
+                "footer.note": "గమనిక: ఈ క్యాలిక్యులేటర్ అంచనా లెక్కలను మాత్రమే అందిస్తుంది. ఎస్ఎస్వై వడ్డీ రేట్లు ప్రభుత్వ నోటిఫికేషన్ల ప్రకారం మారవచ్చు."
+            }
+        };
+
+        // Current language
+        let currentLanguage = 'en';
+
+        // Language selector functionality
+        document.getElementById('langButton').addEventListener('click', function() {
+            document.getElementById('langDropdown').classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', function(event) {
+            if (!event.target.matches('#langButton') && !event.target.closest('#langButton')) {
+                document.getElementById('langDropdown').classList.remove('show');
+            }
+        });
+
+        // Language selection
+        document.querySelectorAll('#langDropdown a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const lang = this.getAttribute('data-lang');
+                setLanguage(lang);
+                document.getElementById('langDropdown').classList.remove('show');
+            });
+        });
+
+        // Function to set language
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.getElementById('currentLang').textContent = lang.toUpperCase();
+            
+            // Update all elements with data-i18n attribute
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+
+            // Store language preference
+            localStorage.setItem('preferredLanguage', lang);
+        }
+
+        // Load saved language preference
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedLang = localStorage.getItem('preferredLanguage');
+            if (savedLang && translations[savedLang]) {
+                setLanguage(savedLang);
+            }
+        });
+
+        // SSY Calculation
+        let ssyChart = null;
+
+        function calculateSSY() {
+            // Get input values
+            const annualInvestment = parseFloat(document.getElementById('annualInvestment').value) || 0;
+            const rate = parseFloat(document.getElementById('interestRate').value) || 0;
+            const girlAge = parseFloat(document.getElementById('girlAge').value) || 0;
+
+            // Calculate investment period (from current age to 21 years)
+            const investmentYears = Math.min(15, 21 - girlAge);
+            const totalYears = 21 - girlAge;
+
+            let balance = 0;
+            const yearlyData = [];
+
+            for (let year = 1; year <= totalYears; year++) {
+                let yearlyInvestment = 0;
+                let yearlyInterest = 0;
+
+                // Investment is made only for first 15 years or until girl turns 15
+                if (year <= investmentYears) {
+                    yearlyInvestment = annualInvestment;
+                    balance += yearlyInvestment;
+                }
+
+                // Calculate interest for the year
+                yearlyInterest = balance * (rate / 100);
+                balance += yearlyInterest;
+
+                // Store yearly data
+                yearlyData.push({
+                    year: year,
+                    investment: yearlyInvestment,
+                    interest: yearlyInterest,
+                    balance: balance,
+                    girlAge: girlAge + year
+                });
+            }
+
+            // Calculate totals
+            const totalInvestment = annualInvestment * investmentYears;
+            const totalInterest = balance - totalInvestment;
+            const maturityAge = girlAge + totalYears;
+
+            // Display results
+            document.getElementById('totalInvestment').textContent = formatCurrency(totalInvestment);
+            document.getElementById('totalInterest').textContent = formatCurrency(totalInterest);
+            document.getElementById('maturityValue').textContent = formatCurrency(balance);
+            document.getElementById('maturityAge').textContent = `${maturityAge} years`;
+
+            // Show results section
+            document.getElementById('resultsSection').classList.remove('hidden');
+
+            // Create growth chart
+            createGrowthChart(yearlyData);
+
+            // Generate yearly breakup table
+            generateYearlyBreakup(yearlyData);
+        }
+
+        function createGrowthChart(yearlyData) {
+            const ctx = document.getElementById('ssyChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (ssyChart) {
+                ssyChart.destroy();
+            }
+
+            // Prepare data for chart
+            const labels = yearlyData.map(d => `Age ${d.girlAge}`);
+            const balanceData = yearlyData.map(d => d.balance);
+
+            // Create new chart
+            ssyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'SSY Balance',
+                        data: balanceData,
+                        backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                        pointBorderColor: '#fff',
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Balance: ${formatCurrency(context.raw)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return formatCurrency(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateYearlyBreakup(yearlyData) {
+            const yearlyBreakupBody = document.getElementById('yearlyBreakupBody');
+            yearlyBreakupBody.innerHTML = '';
+
+            yearlyData.forEach(data => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${data.year}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatCurrency(data.investment)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatCurrency(data.interest)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatCurrency(data.balance)}</td>
+                `;
+                
+                yearlyBreakupBody.appendChild(row);
+            });
+
+            // Show yearly breakup section
+            document.getElementById('yearlyBreakup').classList.remove('hidden');
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Add input validation
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value < 0) this.value = 0;
+                if (this.id === 'annualInvestment' && this.value > 250000) this.value = 250000;
+                if (this.id === 'girlAge' && this.value < 1) this.value = 1;
+                if (this.id === 'girlAge' && this.value > 10) this.value = 10;
+            });
+        });
+    </script>
+</body>
+</html>
