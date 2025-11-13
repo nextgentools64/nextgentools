@@ -1,168 +1,179 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>NextGen Tools - Online Tool Hub</title>
     <meta charset="UTF-8">
+    <title>NextGen Tools - Online Tool Hub</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            background: #f2f4f7;
+            font-family: Arial, sans-serif;
         }
 
-        h1 {
+        header {
             text-align: center;
-            margin-bottom: 10px;
+            padding: 25px;
+            background: #0077ff;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 1px;
         }
 
-        .category-box {
-            background: white;
-            padding: 20px;
-            margin: 20px auto;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 900px;
-            box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+        .search-container {
+            text-align: center;
+            margin: 20px;
+        }
+
+        .search-box {
+            width: 70%;
+            max-width: 500px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 18px;
+            border: 1px solid #ccc;
+            outline: none;
         }
 
         .category-title {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 10px;
+            font-size: 26px;
+            margin: 30px 20px 10px;
             color: #333;
+            font-weight: bold;
         }
 
-        ul {
-            list-style: none;
-            padding-left: 10px;
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            padding: 0 20px 20px;
         }
 
-        ul li {
-            margin: 6px 0;
-        }
-
-        ul li a {
+        .tool-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 18px;
+            box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+            transition: 0.2s;
             text-decoration: none;
-            font-size: 16px;
-            color: #0073ff;
+            color: #0077ff;
+            font-weight: bold;
         }
 
-        ul li a:hover {
-            text-decoration: underline;
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 6px 15px rgba(0,0,0,0.2);
         }
     </style>
+
+    <script>
+        function searchTools() {
+            let input = document.getElementById("searchBox").value.toLowerCase();
+            let cards = document.getElementsByClassName("tool-card");
+
+            for (let i = 0; i < cards.length; i++) {
+                let text = cards[i].innerText.toLowerCase();
+                cards[i].style.display = text.includes(input) ? "block" : "none";
+            }
+        }
+    </script>
+
 </head>
 
 <body>
 
-<h1>NextGen Tools</h1>
-<p style="text-align:center;">Choose any tool from the categories below:</p>
+<header>NextGen Tools</header>
 
-
-<!-- 🟦 CATEGORY 1 — CALCULATORS -->
-<div class="category-box">
-    <div class="category-title">🟦 Calculators</div>
-    <ul>
-        <li><a href="Age Calculator.html">Age Calculator</a></li>
-        <li><a href="Atal Pension Yojana Calculator .html">APY Calculator</a></li>
-        <li><a href="BMI Calculator .html">BMI Calculator</a></li>
-        <li><a href="Business Loan Calculator.html">Business Loan Calculator</a></li>
-        <li><a href="Date Difference Calculator.html">Date Difference Calculator</a></li>
-        <li><a href="Discount Calculator.html">Discount Calculator</a></li>
-        <li><a href="Education Loan Calculator.html">Education Loan Calculator</a></li>
-        <li><a href="EMI Calculator.html">EMI Calculator</a></li>
-        <li><a href="FD Calculator.html">FD Calculator</a></li>
-        <li><a href="GST Calculator.html">GST Calculator</a></li>
-        <li><a href="Home Loan Calculator.html">Home Loan Calculator</a></li>
-        <li><a href="Income Tax Calculator.html">Income Tax Calculator</a></li>
-        <li><a href="Currency Converter Tool.html">Currency Converter</a></li>
-    </ul>
+<div class="search-container">
+    <input type="text" id="searchBox" class="search-box" onkeyup="searchTools()" placeholder="Search Tools...">
 </div>
 
 
-<!-- 🟩 CATEGORY 2 — CONVERTERS -->
-<div class="category-box">
-    <div class="category-title">🟩 Converters</div>
-    <ul>
-        <li><a href="BMP to JPG Converter.html">BMP to JPG Converter</a></li>
-        <li><a href="CSV to JSON Converter.html">CSV to JSON Converter</a></li>
-        <li><a href="csv_to_excel_converter_storedropship_index.html">CSV to Excel Converter</a></li>
-        <li><a href="csv_to_xml_converter_storedropship_i....html">CSV to XML Converter</a></li>
-        <li><a href="JSON Validator.html">JSON Validator</a></li>
-    </ul>
+<!-- ⭐ CATEGORY: Calculators -->
+<div class="category-title">🔢 Calculators</div>
+<div class="grid">
+
+    <a class="tool-card" href="Age Calculator.html">Age Calculator</a>
+    <a class="tool-card" href="Atal Pension Yojana Calculator .html">APY Calculator</a>
+    <a class="tool-card" href="BMI Calculator .html">BMI Calculator</a>
+    <a class="tool-card" href="Business Loan Calculator.html">Business Loan Calculator</a>
+    <a class="tool-card" href="Date Difference Calculator.html">Date Difference Calculator</a>
+    <a class="tool-card" href="Discount Calculator.html">Discount Calculator</a>
+    <a class="tool-card" href="Education Loan Calculator.html">Education Loan Calculator</a>
+    <a class="tool-card" href="EMI Calculator.html">EMI Calculator</a>
+    <a class="tool-card" href="FD Calculator.html">FD Calculator</a>
+    <a class="tool-card" href="GST Calculator.html">GST Calculator</a>
+    <a class="tool-card" href="Home Loan Calculator.html">Home Loan Calculator</a>
+    <a class="tool-card" href="Income Tax Calculator.html">Income Tax Calculator</a>
+    <a class="tool-card" href="Currency Converter Tool.html">Currency Converter</a>
+
 </div>
 
 
-<!-- 🟧 CATEGORY 3 — TEXT TOOLS -->
-<div class="category-box">
-    <div class="category-title">🟧 Text Tools</div>
-    <ul>
-        <li><a href="BT Generator.html">BT Generator</a></li>
-        <li><a href="Duplicate Word Finder .html">Duplicate Word Finder</a></li>
-        <li><a href="Grammar & Spell Checker .html">Grammar & Spell Checker</a></li>
-        <li><a href="Grammar Checker Pro – Online Text Proof...html">Grammar Checker Pro</a></li>
-        <li><a href="Keyword Grouping Tool Pro .html">Keyword Grouping Tool</a></li>
-        <li><a href="Lorem Ipsum Generator Pro.html">Lorem Ipsum Generator</a></li>
-        <li><a href="exam generator.html">Exam Generator</a></li>
-    </ul>
+<!-- ⭐ CATEGORY: Converters -->
+<div class="category-title">🔄 Converters</div>
+<div class="grid">
+    <a class="tool-card" href="BMP to JPG Converter.html">BMP to JPG Converter</a>
+    <a class="tool-card" href="CSV to JSON Converter.html">CSV to JSON Converter</a>
+    <a class="tool-card" href="csv_to_excel_converter_storedropship_index.html">CSV to Excel Converter</a>
+    <a class="tool-card" href="csv_to_xml_converter_storedropship_i....html">CSV to XML Converter</a>
+    <a class="tool-card" href="JSON Validator.html">JSON Validator</a>
 </div>
 
 
-<!-- 🟪 CATEGORY 4 — SEO & WEBSITE TOOLS -->
-<div class="category-box">
-    <div class="category-title">🟪 SEO / Website Tools</div>
-    <ul>
-        <li><a href="Amazon Commission Estimator.html">Amazon Commission Estimator</a></li>
-        <li><a href="Bulk Meta Tag Generator Pro.html">Bulk Meta Tag Generator</a></li>
-        <li><a href="Broken Link Checker Pro .html">Broken Link Checker</a></li>
-        <li><a href="Favicon Generator Pro.html">Favicon Generator</a></li>
-        <li><a href="HEXRGBHSL.html">HEX → RGB → HSL Converter</a></li>
-        <li><a href="color picker.html">Color Picker</a></li>
-    </ul>
+<!-- ⭐ CATEGORY: TEXT TOOLS -->
+<div class="category-title">✍️ Text Tools</div>
+<div class="grid">
+    <a class="tool-card" href="BT Generator.html">BT Generator</a>
+    <a class="tool-card" href="Duplicate Word Finder .html">Duplicate Word Finder</a>
+    <a class="tool-card" href="Grammar & Spell Checker .html">Grammar & Spell Checker</a>
+    <a class="tool-card" href="Grammar Checker Pro – Online Text Proof...html">Grammar Checker Pro</a>
+    <a class="tool-card" href="Keyword Grouping Tool Pro .html">Keyword Grouping Tool</a>
+    <a class="tool-card" href="Lorem Ipsum Generator Pro.html">Lorem Ipsum Generator</a>
+    <a class="tool-card" href="exam generator.html">Exam Generator</a>
 </div>
 
 
-<!-- 🟫 CATEGORY 5 — IMAGE TOOLS -->
-<div class="category-box">
-    <div class="category-title">🟫 Image Tools</div>
-    <ul>
-        <li><a href="Bulk Image Resizer Pro.html">Bulk Image Resizer</a></li>
-        <li><a href="Image Resizer Tool .html">Image Resizer</a></li>
-        <li><a href="Image Compressor Pro.html">Image Compressor</a></li>
-        <li><a href="image_compressor_storedropship_index.html">Image Compressor (v2)</a></li>
-    </ul>
+<!-- ⭐ CATEGORY: SEO & WEBSITE -->
+<div class="category-title">🌐 SEO / Website Tools</div>
+<div class="grid">
+    <a class="tool-card" href="Amazon Commission Estimator.html">Amazon Commission Estimator</a>
+    <a class="tool-card" href="Bulk Meta Tag Generator Pro.html">Bulk Meta Tag Generator</a>
+    <a class="tool-card" href="Broken Link Checker Pro .html">Broken Link Checker</a>
+    <a class="tool-card" href="Favicon Generator Pro.html">Favicon Generator</a>
+    <a class="tool-card" href="HEXRGBHSL.html">HEX/RGB/HSL Converter</a>
+    <a class="tool-card" href="color picker.html">Color Picker</a>
 </div>
 
 
-<!-- 🟨 CATEGORY 6 — FINANCE & BUSINESS -->
-<div class="category-box">
-    <div class="category-title">🟨 Finance & Business Tools</div>
-    <ul>
-        <li><a href="FBA vs Easy Ship Profit Calculator.html">Amazon FBA Profit Calculator</a></li>
-        <li><a href="Business Loan Calculator.html">Business Loan Calculator</a></li>
-    </ul>
+<!-- ⭐ CATEGORY: IMAGE TOOLS -->
+<div class="category-title">🖼️ Image Tools</div>
+<div class="grid">
+    <a class="tool-card" href="Bulk Image Resizer Pro.html">Bulk Image Resizer</a>
+    <a class="tool-card" href="Image Resizer Tool .html">Image Resizer</a>
+    <a class="tool-card" href="Image Compressor Pro.html">Image Compressor</a>
+    <a class="tool-card" href="image_compressor_storedropship_index.html">Image Compressor v2</a>
 </div>
 
 
-<!-- 🟫 CATEGORY 7 — PDF TOOLS -->
-<div class="category-box">
-    <div class="category-title">🟫 PDF Tools</div>
-    <ul>
-        <li><a href="Compress PDF Pro.html">Compress PDF</a></li>
-        <li><a href="Merge PDF by deepseek.html">Merge PDF Tool</a></li>
-        <li><a href="Merge Pdf Pro.html">Merge PDF Pro</a></li>
-    </ul>
+<!-- ⭐ CATEGORY: PDF TOOLS -->
+<div class="category-title">📄 PDF Tools</div>
+<div class="grid">
+    <a class="tool-card" href="Compress PDF Pro.html">Compress PDF</a>
+    <a class="tool-card" href="Merge PDF by deepseek.html">Merge PDF</a>
+    <a class="tool-card" href="Merge Pdf Pro.html">Merge PDF Pro</a>
 </div>
 
 
-<!-- 🟦 CATEGORY 8 — OTHER UTILITIES -->
-<div class="category-box">
-    <div class="category-title">🟦 Other Tools</div>
-    <ul>
-        <li><a href="Kundli.html">Kundli Generator</a></li>
-    </ul>
+<!-- ⭐ CATEGORY: Other Tools -->
+<div class="category-title">🧰 Other Tools</div>
+<div class="grid">
+    <a class="tool-card" href="Kundli.html">Kundli Generator</a>
 </div>
+
 
 </body>
 </html>
