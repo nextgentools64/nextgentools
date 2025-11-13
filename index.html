@@ -2,178 +2,167 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>NextGen Tools - Online Tool Hub</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: #f2f4f7;
-            font-family: Arial, sans-serif;
-        }
+    <title>NextGenTools - Online Tool Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-        header {
-            text-align: center;
-            padding: 25px;
-            background: #0077ff;
-            color: white;
-            font-size: 32px;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: #f5f7fa;
+        font-family: 'Inter', sans-serif;
+    }
 
-        .search-container {
-            text-align: center;
-            margin: 20px;
-        }
+    /* HEADER */
+    .header {
+        background: #ffffff;
+        padding: 20px 30px;
+        box-shadow: 0px 2px 10px rgba(0,0,0,0.05);
+        font-size: 26px;
+        font-weight: 600;
+        color: #0057d8;
+    }
 
-        .search-box {
-            width: 70%;
-            max-width: 500px;
-            padding: 12px 15px;
-            border-radius: 8px;
-            font-size: 18px;
-            border: 1px solid #ccc;
-            outline: none;
-        }
+    /* SEARCH BAR */
+    .search-container {
+        text-align: center;
+        margin: 25px;
+    }
 
-        .category-title {
-            font-size: 26px;
-            margin: 30px 20px 10px;
-            color: #333;
-            font-weight: bold;
-        }
+    #searchBox {
+        width: 80%;
+        max-width: 500px;
+        padding: 12px 18px;
+        border-radius: 40px;
+        border: 1px solid #cfd9e6;
+        font-size: 16px;
+        outline: none;
+        transition: 0.3s;
+    }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px;
-            padding: 0 20px 20px;
-        }
+    #searchBox:focus {
+        border-color: #0057d8;
+        box-shadow: 0px 0px 8px rgba(0,87,216,0.3);
+    }
 
-        .tool-card {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 18px;
-            box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
-            transition: 0.2s;
-            text-decoration: none;
-            color: #0077ff;
-            font-weight: bold;
-        }
+    /* CATEGORY SECTION */
+    .category-title {
+        font-size: 22px;
+        margin: 35px 20px 10px;
+        font-weight: 600;
+        color: #333;
+        border-left: 5px solid #0057d8;
+        padding-left: 10px;
+    }
 
-        .tool-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0px 6px 15px rgba(0,0,0,0.2);
-        }
-    </style>
+    /* TOOL GRID */
+    .tool-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-gap: 18px;
+        padding: 10px 25px 40px;
+    }
 
-    <script>
-        function searchTools() {
-            let input = document.getElementById("searchBox").value.toLowerCase();
-            let cards = document.getElementsByClassName("tool-card");
+    /* TOOL CARD */
+    .tool-card {
+        background: #ffffff;
+        padding: 18px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0px 3px 10px rgba(0,0,0,0.05);
+        transition: 0.25s;
+        font-size: 17px;
+        font-weight: 500;
+    }
 
-            for (let i = 0; i < cards.length; i++) {
-                let text = cards[i].innerText.toLowerCase();
-                cards[i].style.display = text.includes(input) ? "block" : "none";
-            }
-        }
-    </script>
+    .tool-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0px 6px 20px rgba(0,0,0,0.08);
+        border-color: #0057d8;
+    }
+
+    a {
+        text-decoration: none;
+        color: #0057d8;
+    }
+
+    /* FOOTER */
+    .footer {
+        margin-top: 40px;
+        background: #ffffff;
+        text-align: center;
+        padding: 20px;
+        font-size: 14px;
+        color: #555;
+        border-top: 1px solid #e5e5e5;
+    }
+
+</style>
 
 </head>
-
 <body>
 
-<header>NextGen Tools</header>
+<!-- HEADER -->
+<div class="header">NextGenTools</div>
 
+<!-- SEARCH BOX -->
 <div class="search-container">
-    <input type="text" id="searchBox" class="search-box" onkeyup="searchTools()" placeholder="Search Tools...">
+    <input type="text" id="searchBox" placeholder="Search tools..." onkeyup="searchTools()">
 </div>
 
+<!-- CATEGORY 1: Calculators -->
+<div class="category-title">Calculators</div>
+<div class="tool-grid" id="toolList">
 
-<!-- ⭐ CATEGORY: Calculators -->
-<div class="category-title">🔢 Calculators</div>
-<div class="grid">
-
-    <a class="tool-card" href="Age Calculator.html">Age Calculator</a>
-    <a class="tool-card" href="Atal Pension Yojana Calculator .html">APY Calculator</a>
-    <a class="tool-card" href="BMI Calculator .html">BMI Calculator</a>
-    <a class="tool-card" href="Business Loan Calculator.html">Business Loan Calculator</a>
-    <a class="tool-card" href="Date Difference Calculator.html">Date Difference Calculator</a>
-    <a class="tool-card" href="Discount Calculator.html">Discount Calculator</a>
-    <a class="tool-card" href="Education Loan Calculator.html">Education Loan Calculator</a>
-    <a class="tool-card" href="EMI Calculator.html">EMI Calculator</a>
-    <a class="tool-card" href="FD Calculator.html">FD Calculator</a>
-    <a class="tool-card" href="GST Calculator.html">GST Calculator</a>
-    <a class="tool-card" href="Home Loan Calculator.html">Home Loan Calculator</a>
-    <a class="tool-card" href="Income Tax Calculator.html">Income Tax Calculator</a>
-    <a class="tool-card" href="Currency Converter Tool.html">Currency Converter</a>
+    <a href="Age Calculator.html" class="tool-card">Age Calculator</a>
+    <a href="Amazon Commission Estimator.html" class="tool-card">Amazon Commission Estimator</a>
+    <a href="BMI Calculator .html" class="tool-card">BMI Calculator</a>
+    <a href="Business Loan Calculator.html" class="tool-card">Business Loan Calculator</a>
+    <a href="Discount Calculator.html" class="tool-card">Discount Calculator</a>
+    <a href="FD Calculator.html" class="tool-card">FD Calculator</a>
+    <a href="Income Tax Calculator.html" class="tool-card">Income Tax Calculator</a>
+    <a href="GST Calculator.html" class="tool-card">GST Calculator</a>
+    <a href="EMI Calculator.html" class="tool-card">EMI Calculator</a>
+    <a href="Date Difference Calculator.html" class="tool-card">Date Difference Calculator</a>
+    <a href="Currency Converter Tool.html" class="tool-card">Currency Converter</a>
 
 </div>
 
-
-<!-- ⭐ CATEGORY: Converters -->
-<div class="category-title">🔄 Converters</div>
-<div class="grid">
-    <a class="tool-card" href="BMP to JPG Converter.html">BMP to JPG Converter</a>
-    <a class="tool-card" href="CSV to JSON Converter.html">CSV to JSON Converter</a>
-    <a class="tool-card" href="csv_to_excel_converter_storedropship_index.html">CSV to Excel Converter</a>
-    <a class="tool-card" href="csv_to_xml_converter_storedropship_i....html">CSV to XML Converter</a>
-    <a class="tool-card" href="JSON Validator.html">JSON Validator</a>
+<!-- CATEGORY 2: Converters -->
+<div class="category-title">Converters</div>
+<div class="tool-grid">
+    <a href="BMP to JPG Converter.html" class="tool-card">BMP to JPG</a>
+    <a href="Compress PDF Pro.html" class="tool-card">Compress PDF</a>
+    <a href="CSV to JSON Converter.html" class="tool-card">CSV to JSON</a>
+    <a href="CSV Bulk Keyword Cleaner.html" class="tool-card">CSV Keyword Cleaner</a>
+    <a href="JSON Validator.html" class="tool-card">JSON Validator</a>
+    <a href="WebP to PNG Converter .html" class="tool-card">WebP to PNG</a>
+    <a href="Image Compressor Pro.html" class="tool-card">Image Compressor</a>
 </div>
 
-
-<!-- ⭐ CATEGORY: TEXT TOOLS -->
-<div class="category-title">✍️ Text Tools</div>
-<div class="grid">
-    <a class="tool-card" href="BT Generator.html">BT Generator</a>
-    <a class="tool-card" href="Duplicate Word Finder .html">Duplicate Word Finder</a>
-    <a class="tool-card" href="Grammar & Spell Checker .html">Grammar & Spell Checker</a>
-    <a class="tool-card" href="Grammar Checker Pro – Online Text Proof...html">Grammar Checker Pro</a>
-    <a class="tool-card" href="Keyword Grouping Tool Pro .html">Keyword Grouping Tool</a>
-    <a class="tool-card" href="Lorem Ipsum Generator Pro.html">Lorem Ipsum Generator</a>
-    <a class="tool-card" href="exam generator.html">Exam Generator</a>
+<!-- CATEGORY 3: Writing Tools -->
+<div class="category-title">Writing Tools</div>
+<div class="tool-grid">
+    <a href="Grammar & Spell Checker .html" class="tool-card">Grammar Checker</a>
+    <a href="lorem_ipsum_generator_storedropship_index.html" class="tool-card">Lorem Ipsum Generator</a>
+    <a href="Duplicate Word Finder .html" class="tool-card">Duplicate Word Finder</a>
+    <a href="Keyword Grouping Tool Pro .html" class="tool-card">Keyword Grouping Tool</a>
 </div>
 
+<!-- FOOTER -->
+<div class="footer">© 2025 NextGenTools • All Rights Reserved</div>
 
-<!-- ⭐ CATEGORY: SEO & WEBSITE -->
-<div class="category-title">🌐 SEO / Website Tools</div>
-<div class="grid">
-    <a class="tool-card" href="Amazon Commission Estimator.html">Amazon Commission Estimator</a>
-    <a class="tool-card" href="Bulk Meta Tag Generator Pro.html">Bulk Meta Tag Generator</a>
-    <a class="tool-card" href="Broken Link Checker Pro .html">Broken Link Checker</a>
-    <a class="tool-card" href="Favicon Generator Pro.html">Favicon Generator</a>
-    <a class="tool-card" href="HEXRGBHSL.html">HEX/RGB/HSL Converter</a>
-    <a class="tool-card" href="color picker.html">Color Picker</a>
-</div>
+<script>
+function searchTools() {
+    let input = document.getElementById("searchBox").value.toLowerCase();
+    let cards = document.querySelectorAll(".tool-card");
 
-
-<!-- ⭐ CATEGORY: IMAGE TOOLS -->
-<div class="category-title">🖼️ Image Tools</div>
-<div class="grid">
-    <a class="tool-card" href="Bulk Image Resizer Pro.html">Bulk Image Resizer</a>
-    <a class="tool-card" href="Image Resizer Tool .html">Image Resizer</a>
-    <a class="tool-card" href="Image Compressor Pro.html">Image Compressor</a>
-    <a class="tool-card" href="image_compressor_storedropship_index.html">Image Compressor v2</a>
-</div>
-
-
-<!-- ⭐ CATEGORY: PDF TOOLS -->
-<div class="category-title">📄 PDF Tools</div>
-<div class="grid">
-    <a class="tool-card" href="Compress PDF Pro.html">Compress PDF</a>
-    <a class="tool-card" href="Merge PDF by deepseek.html">Merge PDF</a>
-    <a class="tool-card" href="Merge Pdf Pro.html">Merge PDF Pro</a>
-</div>
-
-
-<!-- ⭐ CATEGORY: Other Tools -->
-<div class="category-title">🧰 Other Tools</div>
-<div class="grid">
-    <a class="tool-card" href="Kundli.html">Kundli Generator</a>
-</div>
-
+    cards.forEach(card => {
+        let text = card.innerText.toLowerCase();
+        card.style.display = text.includes(input) ? "block" : "none";
+    });
+}
+</script>
 
 </body>
 </html>
