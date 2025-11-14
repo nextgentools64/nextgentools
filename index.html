@@ -1,168 +1,240 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>NextGenTools - Online Tool Hub</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NextGenTools — All Tools</title>
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,
+%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E
+%3Crect width='64' height='64' rx='12' fill='%230057d8'/%3E
+%3Cg transform='translate(18,18) scale(0.9)'%3E
+%3Ccircle cx='8' cy='8' r='8' fill='%23fff'/%3E
+%3Crect x='4' y='2' width='8' height='4' rx='1' fill='%230057d8'/%3E
+%3C/g%3E
+%3C/svg%3E">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-    body {
-        margin: 0;
-        padding: 0;
-        background: #f5f7fa;
-        font-family: 'Inter', sans-serif;
-    }
-
-    /* HEADER */
-    .header {
-        background: #ffffff;
-        padding: 20px 30px;
-        box-shadow: 0px 2px 10px rgba(0,0,0,0.05);
-        font-size: 26px;
-        font-weight: 600;
-        color: #0057d8;
-    }
-
-    /* SEARCH BAR */
-    .search-container {
-        text-align: center;
-        margin: 25px;
-    }
-
-    #searchBox {
-        width: 80%;
-        max-width: 500px;
-        padding: 12px 18px;
-        border-radius: 40px;
-        border: 1px solid #cfd9e6;
-        font-size: 16px;
-        outline: none;
-        transition: 0.3s;
-    }
-
-    #searchBox:focus {
-        border-color: #0057d8;
-        box-shadow: 0px 0px 8px rgba(0,87,216,0.3);
-    }
-
-    /* CATEGORY SECTION */
-    .category-title {
-        font-size: 22px;
-        margin: 35px 20px 10px;
-        font-weight: 600;
-        color: #333;
-        border-left: 5px solid #0057d8;
-        padding-left: 10px;
-    }
-
-    /* TOOL GRID */
-    .tool-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        grid-gap: 18px;
-        padding: 10px 25px 40px;
-    }
-
-    /* TOOL CARD */
-    .tool-card {
-        background: #ffffff;
-        padding: 18px;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0px 3px 10px rgba(0,0,0,0.05);
-        transition: 0.25s;
-        font-size: 17px;
-        font-weight: 500;
-    }
-
-    .tool-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0px 6px 20px rgba(0,0,0,0.08);
-        border-color: #0057d8;
-    }
-
-    a {
-        text-decoration: none;
-        color: #0057d8;
-    }
-
-    /* FOOTER */
-    .footer {
-        margin-top: 40px;
-        background: #ffffff;
-        text-align: center;
-        padding: 20px;
-        font-size: 14px;
-        color: #555;
-        border-top: 1px solid #e5e5e5;
-    }
-
+:root{--accent:#0057d8;--bg:#f5f7fa;--card:#fff;--muted:#6b7280}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:#111}
+.header{display:flex;align-items:center;gap:14px;padding:18px;background:var(--card);box-shadow:0 2px 10px rgba(0,0,0,0.05)}
+.logo{height:52px}
+.brand{font-weight:700;color:var(--accent);font-size:20px}
+.sub{font-size:12px;color:var(--muted)}
+.search-wrap{text-align:center;padding:22px}
+#search{width:86%;max-width:720px;padding:12px 16px;border-radius:40px;border:1px solid #d7e0ee;font-size:16px}
+#search:focus{outline:none;box-shadow:0 6px 18px rgba(0,87,216,0.12);border-color:var(--accent)}
+.container{max-width:1180px;margin:0 auto;padding:6px 16px 60px}
+.category{margin:30px 0}
+.category h2{font-size:20px;border-left:5px solid var(--accent);padding-left:10px;margin:0 0 12px;font-weight:700;color:#222}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.card{background:var(--card);padding:14px;border-radius:10px;border:1px solid #e6eef9;box-shadow:0 3px 12px rgba(12,20,50,0.04);transition:transform .18s}
+.card a{color:var(--accent);font-weight:600;text-decoration:none;font-size:15px;display:block}
+.card p{margin:8px 0 0;color:var(--muted);font-size:13px}
+.footer{margin-top:40px;padding:18px;text-align:center;background:var(--card);border-top:1px solid #eee;color:var(--muted);font-size:14px}
+@media(max-width:520px){#search{width:94%}}
 </style>
 
+<script>
+function doSearch(){
+  const q=document.getElementById('search').value.toLowerCase().trim();
+  document.querySelectorAll('.card').forEach(c=>{
+    c.style.display = q==='' ? 'block' : (c.innerText.toLowerCase().indexOf(q)!==-1 ? 'block' : 'none');
+  });
+}
+</script>
 </head>
 <body>
 
-<!-- HEADER -->
-<div class="header">NextGenTools</div>
+<header class="header">
+  <svg class="logo" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NextGenTools logo">
+    <defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#0066ff"/><stop offset="1" stop-color="#00a0ff"/></linearGradient></defs>
+    <g transform="translate(0,10)">
+      <rect x="0" y="10" rx="10" ry="10" width="84" height="60" fill="#0d6efd" opacity="0.12"/>
+      <rect x="0" y="0" rx="10" ry="10" width="84" height="28" fill="url(#g1)"/>
+      <rect x="18" y="-6" rx="4" ry="4" width="48" height="10" fill="#0057d8"/>
+      <g transform="translate(42,38) scale(0.9)"><circle cx="0" cy="0" r="12" fill="#0077ff"/>
+        <g fill="#ffffff" transform="translate(-2,-2)">
+          <rect x="-2.5" y="-14" width="5" height="6" rx="1"/><rect x="-2.5" y="8" width="5" height="6" rx="1"/>
+          <rect x="-14" y="-2.5" width="6" height="5" rx="1"/><rect x="8" y="-2.5" width="6" height="5" rx="1"/>
+          <circle cx="0" cy="0" r="4" fill="#ffffff"/>
+        </g>
+      </g>
+    </g>
+  </svg>
 
-<!-- SEARCH BOX -->
-<div class="search-container">
-    <input type="text" id="searchBox" placeholder="Search tools..." onkeyup="searchTools()">
+  <div>
+    <div class="brand">NextGenTools</div>
+    <div class="sub">Free Online Tools Hub</div>
+  </div>
+</header>
+
+<div class="search-wrap">
+  <input id="search" placeholder="Search tools (e.g. PDF, Calculator, CSV)..." onkeyup="doSearch()" />
 </div>
 
-<!-- CATEGORY 1: Calculators -->
-<div class="category-title">Calculators</div>
-<div class="tool-grid" id="toolList">
+<div class="container">
 
-    <a href="Age Calculator.html" class="tool-card">Age Calculator</a>
-    <a href="Amazon Commission Estimator.html" class="tool-card">Amazon Commission Estimator</a>
-    <a href="BMI Calculator .html" class="tool-card">BMI Calculator</a>
-    <a href="Business Loan Calculator.html" class="tool-card">Business Loan Calculator</a>
-    <a href="Discount Calculator.html" class="tool-card">Discount Calculator</a>
-    <a href="FD Calculator.html" class="tool-card">FD Calculator</a>
-    <a href="Income Tax Calculator.html" class="tool-card">Income Tax Calculator</a>
-    <a href="GST Calculator.html" class="tool-card">GST Calculator</a>
-    <a href="EMI Calculator.html" class="tool-card">EMI Calculator</a>
-    <a href="Date Difference Calculator.html" class="tool-card">Date Difference Calculator</a>
-    <a href="Currency Converter Tool.html" class="tool-card">Currency Converter</a>
+  <!-- Calculators -->
+  <section class="category"><h2>Calculators</h2>
+    <div class="grid">
+      <div class="card"><a target="_blank" rel="noopener" href="Age%20Calculator.html">Age Calculator</a><p>Calculate age from DOB</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="BMI%20Calculator.html">BMI Calculator</a><p>Body Mass Index</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Business%20Loan%20Calculator.html">Business Loan Calculator</a><p>Estimate business loan payments</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="EMI%20Calculator.html">EMI Calculator</a><p>EMI schedule</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="FD%20Calculator.html">FD Calculator</a><p>Fixed deposit returns</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Income%20Tax%20Calculator.html">Income Tax Calculator</a><p>Estimate taxes</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="GST%20Calculator.html">GST Calculator</a><p>GST calculations</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Home%20Loan%20Calculator.html">Home Loan Calculator</a><p>Home loan EMI</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Personal%20Loan%20Calculator.html">Personal Loan Calculator</a><p>Personal loan estimates</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="PPF%20Calculator.html">PPF Calculator</a><p>PPF returns</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Post%20Office%20MIS%20Calculator%20.html">Post Office MIS Calculator</a><p>Post office MIS returns</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Profit%20Margin%20Calculator.html">Profit Margin Calculator</a><p>Profit & markup</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="RD%20Calculator.html">RD Calculator</a><p>Recurring deposit returns</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="SIP%20Calculator.html">SIP Calculator</a><p>Mutual fund SIP returns</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="NSC%20Calculator.html">NSC Calculator</a><p>NSC returns</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Atal%20Pension%20Yojana%20Calculator.html">Atal Pension Yojana Calculator</a><p>APY calculator</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Pradhan%20Mantri%20Awas%20Yojana%20Calculator%20.html">Pradhan Mantri Awas Yojana Calculator</a><p>PMAY calculator</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Selling%20Price%20Calculator%20.html">Selling Price Calculator</a><p>Calculate selling price</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Discount%20Calculator.html">Discount Calculator</a><p>Discount calculations</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Date%20Difference%20Calculator.html">Date Difference Calculator</a><p>Days between dates</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Reading%20Time%20Calculator.html">Reading Time Calculator</a><p>Estimate reading time</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="SIP%20Calculator.html">SIP Calculator (duplicate)</a><p></p></div>
+    </div>
+  </section>
 
+  <!-- PDF Tools -->
+  <section class="category"><h2>PDF Tools</h2>
+    <div class="grid">
+      <div class="card"><a target="_blank" rel="noopener" href="Compress%20PDF%20Pro.html">Compress PDF Pro</a><p>Reduce PDF size</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Merge%20PDF%20by%20deepseek.html">Merge PDF by deepseek</a><p>Merge PDFs</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Merge%20Pdf%20Pro.html">Merge Pdf Pro</a><p>Merge PDFs</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Split%20PDF%20Pro%20.html">Split PDF Pro</a><p>Split PDF</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="PDF%20to%20JPG%20Converter%20.html">PDF to JPG Converter</a><p>PDF → JPG</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="PDF%20to%20Word%20Converter%20Pro.html">PDF to Word Converter Pro</a><p>PDF → Word</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="pdf_to_word_converter.html">PDF to Word Converter (alt)</a><p></p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="pdf_to_png_tool_page.html">PDF to PNG</a><p>PDF → PNG</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="pdf_to_txt_tool_page.html">PDF to TXT</a><p>Extract text</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="pdf_to_csv_converter.html">PDF to CSV</a><p>Table extraction</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="pdf_to_excel_converter.html">PDF to Excel</a><p>PDF → Excel</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="pdf_to_html_converter.html">PDF to HTML</a><p>PDF → HTML</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="pdf_to_json_converter.html">PDF to JSON</a><p>PDF → JSON</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="pdf_to_markdown_tool_page.html">PDF to Markdown</a><p>PDF → Markdown</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="pdf_to_mobi_converter.html">PDF to MOBI</a><p>eBook convert</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="pdf%20to%20epub%20tool%20page.html">PDF to EPUB</a><p>eBook convert</p></div>
+    </div>
+  </section>
+
+  <!-- Converters & Utilities -->
+  <section class="category"><h2>Converters & Utilities</h2>
+    <div class="grid">
+      <div class="card"><a target="_blank" rel="noopener" href="BMP%20to%20JPG%20Converter.html">BMP to JPG Converter</a><p>Image conversion</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="PNG%20to%20JPG%20Converter%20.html">PNG to JPG Converter</a><p>PNG → JPG</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="WebP%20to%20PNG%20Converter%20.html">WebP to PNG</a><p>WebP → PNG</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="csv%20to%20excel%20converter.html">csv to excel converter</a><p>CSV → Excel</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="csv%20to%20xml%20converter.html">csv to xml converter</a><p>CSV → XML</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="CSV%20to%20JSON%20Converter.html">CSV to JSON Converter</a><p>CSV → JSON</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="csv%20json%20editor.html">csv json editor</a><p>Edit CSV & JSON</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Currency%20Converter%20Tool.html">Currency Converter Tool</a><p>Convert currencies</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Unit%20Converter%20Tool%20.html">Unit Converter Tool</a><p>Units & measures</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Time%20Zone%20Converter%20.html">Time Zone Converter</a><p>Time zones</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Screenshot%20%E2%86%92%20Text%20%28Client-side%20OCR%29.html">Screenshot → Text (OCR)</a><p>Client-side OCR</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="URL%20Shortener.html">URL Shortener</a><p>Short links</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="JSON%20Validator.html">JSON Validator</a><p>Validate JSON</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="regex%20tester.html">regex tester</a><p>Test regex</p></div>
+    </div>
+  </section>
+
+  <!-- SEO & Website Tools -->
+  <section class="category"><h2>SEO & Website Tools</h2>
+    <div class="grid">
+      <div class="card"><a target="_blank" rel="noopener" href="Broken%20Link%20Checker%20Pro.html">Broken Link Checker Pro</a><p>Find broken links</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Bulk%20Meta%20Tag%20Generator%20Pro.html">Bulk Meta Tag Generator Pro</a><p>Create meta tags</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Meta%20Tag%20Generator%20Pro%20.html">Meta Tag Generator Pro</a><p>Meta generator</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Robots.txt%20Generator%20Pro%20.html">Robots.txt Generator Pro</a><p>Generate robots.txt</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="SEO%20Analyzer%20Tool%20.html">SEO Analyzer Tool</a><p>Analyze SEO</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="SEO%20Optimize.html">SEO Optimize</a><p>Optimization helpers</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="SEO%20Setup%20%28Meta%20Tags%2C%20Sitemap%2C%20Console%29%20.html">SEO Setup (Meta Tags, Sitemap, Console)</a><p>SEO helper</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Polished%20Keyword%20Duplicate%20Remover.html">Polished Keyword Duplicate Remover</a><p>Keyword cleanup</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="CSV%20Bulk%20Keyword%20Cleaner.html">CSV Bulk Keyword Cleaner</a><p>Bulk keyword cleaning</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Keyword%20Grouping%20Tool%20Pro.html">Keyword Grouping Tool Pro</a><p>Group keywords</p></div>
+    </div>
+  </section>
+
+  <!-- Text & Writing Tools -->
+  <section class="category"><h2>Text & Writing Tools</h2>
+    <div class="grid">
+      <div class="card"><a target="_blank" rel="noopener" href="Grammar%20%26%20Spell%20Checker%20.html">Grammar & Spell Checker</a><p>Grammar & spelling</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Plagiarism%20Checker.html">Plagiarism Checker</a><p>Plagiarism check</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Duplicate%20Word%20Finder.html">Duplicate Word Finder</a><p>Find duplicates</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="lorem%20ipsum%20generator.html">Lorem Ipsum Generator</a><p>Dummy text</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Text%20%26%20Writing%20Tools%20.html">Text & Writing Tools</a><p>Collection</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Text%20to%20Speech%20Pro%20%28AI%20Voice%20Generator%29.html">Text to Speech Pro (AI Voice)</a><p>Text to voice</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="spell%20checker.html">spell checker</a><p>Spell check</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="uuid%20generator.html">uuid generator</a><p>Generate UUIDs</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Real-Time%20Word%20Counte.html">Real-Time Word Counte</a><p>Live word count</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Password%20Generator%20Pro.html">Password Generator Pro</a><p>Generate secure passwords</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="BT%20Generator.html">BT Generator</a><p>Tool</p></div>
+    </div>
+  </section>
+
+  <!-- Images & Media -->
+  <section class="category"><h2>Images & Media</h2>
+    <div class="grid">
+      <div class="card"><a target="_blank" rel="noopener" href="Bulk%20Image%20Resizer%20Pro.html">Bulk Image Resizer Pro</a><p>Resize multiple images</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Image%20Resizer%20Tool%20.html">Image Resizer Tool</a><p>Resize single images</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Image%20Compressor%20Pro.html">Image Compressor Pro</a><p>Compress images</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="image_compressor.html">image_compressor</a><p>Alternate compressor</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Favicon%20Generator%20Pro.html">Favicon Generator Pro</a><p>Create favicon</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="HEXRGBHSL.html">HEX → RGB → HSL</a><p>Color conversion</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="color%20picker.html">color picker</a><p>Pick colors</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="QR%20Code%20Generator.html">QR Code Generator</a><p>Generate QR codes</p></div>
+    </div>
+  </section>
+
+  <!-- Finance & E-commerce -->
+  <section class="category"><h2>Finance & E-commerce</h2>
+    <div class="grid">
+      <div class="card"><a target="_blank" rel="noopener" href="FBA%20vs%20Easy%20Ship%20Profit%20Calculator.html">FBA vs Easy Ship Profit Calculator</a><p>FBA profit calc</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Amazon%20Commission%20Estimator.html">Amazon Commission Estimator</a><p>Estimate Amazon fees</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Business%20Loan%20Calculator.html">Business Loan Calculator</a><p>Business finance</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Selling%20Price%20Calculator%20.html">Selling Price Calculator</a><p>Set selling price</p></div>
+    </div>
+  </section>
+
+  <!-- Productivity & Realtime -->
+  <section class="category"><h2>Realtime & Productivity</h2>
+    <div class="grid">
+      <div class="card"><a target="_blank" rel="noopener" href="Real%20Time%20Collaborative%20Whiteboard.html">Real Time Collaborative Whiteboard</a><p>Live drawing board</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Real-Time%20Group%20Chat.html">Real-Time Group Chat</a><p>Group chat</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Multiplayer%20Tic-Tac-Toe.html">Multiplayer Tic-Tac-Toe</a><p>Game</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="To%20Do%20List.html">To Do List</a><p>Todo app</p></div>
+    </div>
+  </section>
+
+  <!-- Developer & Misc -->
+  <section class="category"><h2>Developer & Misc</h2>
+    <div class="grid">
+      <div class="card"><a target="_blank" rel="noopener" href="Keyword%20Grouping%20Tool%20Pro.html">Keyword Grouping Tool Pro</a><p>Group keywords</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Polished%20Keyword%20Duplicate%20Remover.html">Polished Keyword Duplicate Remover</a><p>Remove duplicates</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Kundli.html">Kundli Generator</a><p>Astrology</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="exam%20generator.html">exam generator</a><p>Create exams</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Password%20Generator%20Pro.html">Password Generator Pro</a><p>Secure passwords</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="uuid%20generator.html">uuid generator</a><p>Unique IDs</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="WebP%20to%20PNG%20Converter%20.html">WebP to PNG Converter</a><p>Image conversion</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="WhatsApp%20Link%20Generator.html">WhatsApp Link Generator</a><p>Generate WA links</p></div>
+      <div class="card"><a target="_blank" rel="noopener" href="Word%20Counter%20Pro.html">Word Counter Pro</a><p>Live word count</p></div>
+    </div>
+  </section>
+
+  <div style="margin-top:28px;font-size:13px;color:var(--muted);text-align:center">
+    Tip: Use the search box above to quickly find any tool. Links open in a new tab (safe).
+  </div>
+
+  <footer class="footer">© 2025 NextGenTools — All Rights Reserved</footer>
 </div>
-
-<!-- CATEGORY 2: Converters -->
-<div class="category-title">Converters</div>
-<div class="tool-grid">
-    <a href="BMP to JPG Converter.html" class="tool-card">BMP to JPG</a>
-    <a href="Compress PDF Pro.html" class="tool-card">Compress PDF</a>
-    <a href="CSV to JSON Converter.html" class="tool-card">CSV to JSON</a>
-    <a href="CSV Bulk Keyword Cleaner.html" class="tool-card">CSV Keyword Cleaner</a>
-    <a href="JSON Validator.html" class="tool-card">JSON Validator</a>
-    <a href="WebP to PNG Converter .html" class="tool-card">WebP to PNG</a>
-    <a href="Image Compressor Pro.html" class="tool-card">Image Compressor</a>
-</div>
-
-<!-- CATEGORY 3: Writing Tools -->
-<div class="category-title">Writing Tools</div>
-<div class="tool-grid">
-    <a href="Grammar & Spell Checker .html" class="tool-card">Grammar Checker</a>
-    <a href="lorem_ipsum_generator_storedropship_index.html" class="tool-card">Lorem Ipsum Generator</a>
-    <a href="Duplicate Word Finder .html" class="tool-card">Duplicate Word Finder</a>
-    <a href="Keyword Grouping Tool Pro .html" class="tool-card">Keyword Grouping Tool</a>
-</div>
-
-<!-- FOOTER -->
-<div class="footer">© 2025 NextGenTools • All Rights Reserved</div>
-
-<script>
-function searchTools() {
-    let input = document.getElementById("searchBox").value.toLowerCase();
-    let cards = document.querySelectorAll(".tool-card");
-
-    cards.forEach(card => {
-        let text = card.innerText.toLowerCase();
-        card.style.display = text.includes(input) ? "block" : "none";
-    });
-}
-</script>
 
 </body>
 </html>
