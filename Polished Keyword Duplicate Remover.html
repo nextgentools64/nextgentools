@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Keyword Duplicate Remover — storedropship.in</title>
+  <meta name="description" content="Paste keywords (comma or line separated). Remove duplicates, copy or download clean list.">
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f7f7fb;color:#222;padding:24px;}
+    .card{max-width:900px;margin:12px auto;padding:20px;background:#fff;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.06);}
+    h1{font-size:22px;margin:0 0 8px;}
+    p.lead{margin:0 0 16px;color:#444;}
+    textarea{width:100%;height:180px;padding:12px;font-size:15px;border:1px solid #ddd;border-radius:6px;resize:vertical;}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+    button, .btn{background:#0b7a5b;color:#fff;border:none;padding:10px 14px;border-radius:8px;font-size:14px;cursor:pointer;}
+    button.secondary{background:#5a6b7a;}
+    button.gray{background:#888;}
+    label.inline{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:#333}
+    .output{margin-top:16px;padding:12px;background:#fafafa;border:1px dashed #e0e0e0;border-radius:6px;white-space:pre-wrap;min-height:60px;}
+    .small{font-size:13px;color:#666;margin-top:6px;}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔑 Keyword Duplicate Remover</h1>
+    <p class="lead">Paste keywords (comma / newline / semicolon / pipe separated). Click <strong>Clean</strong> to remove duplicates (case-insensitive).</p>
+
+    <textarea id="input" placeholder="eg: travel diary, Travel Diary, 2023 diary&#10;personalized journal,personalised diary"></textarea>
+
+    <div class="controls">
+      <button id="cleanBtn">Clean</button>
+      <button id="copyBtn" class="secondary">Copy Result</button>
+      <button id="downloadBtn" class="secondary">Download CSV</button>
+      <button id="clearBtn" class="gray">Clear</button>
+      <label class="inline"><input type="checkbox" id="sortOpt"> Sort alphabetically</label>
+    </div>
+
+    <div class="small">Splits supported: comma (,), newline, semicolon (;), pipe (|). Duplicate removal is <strong>case-insensitive</strong> (keeps first occurrence's casing).</div>
+
+    <h3 style="margin-top:18px">✅ Clean Keywords</h3>
+    <div id="output" class="output" aria-live="polite"></div>
+    <div class="small" id="count"></div>
+  </div>
+
+  <script>
+    const inputEl = document.getElementById('input');
+    const outputEl = document.getElementById('output');
+    const cleanBtn = document.getElementById('cleanBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const sortOpt = document.getElementById('sortOpt');
+    const countEl = document.getElementById('count');
+
+    function parseKeywords(text){
+      if(!text) return [];
+      // split on newline, comma, semicolon, pipe
+      let parts = text.split(/[\n,;|]+/).map(s=>s.trim()).filter(Boolean);
+      return parts;
+    }
+
+    function uniquePreserveOrder(arr){
+      const seen = new Set();
+      const result = [];
+      for(const item of arr){
+        const key = item.toLowerCase();
+        if(!seen.has(key)){
+          seen.add(key);
+          result.push(item);
+        }
+      }
+      return result;
+    }
+
+    function updateOutput(list){
+      outputEl.textContent = list.join(", ");
+      countEl.textContent = `Total: ${list.length} keywords`;
+    }
+
+    cleanBtn.addEventListener('click', ()=>{
+      const raw = inputEl.value;
+      let list = parseKeywords(raw);
+      let unique = uniquePreserveOrder(list);
+      if(sortOpt.checked){
+        unique = unique.slice().sort((a,b)=> a.toLowerCase().localeCompare(b.toLowerCase()));
+      }
+      updateOutput(unique);
+    });
+
+    copyBtn.addEventListener('click', ()=>{
+      const text = outputEl.textContent;
+      if(!text){ alert('No result to copy.'); return; }
+      navigator.clipboard.writeText(text).then(()=> {
+        copyBtn.textContent = 'Copied ✓';
+        setTimeout(()=> copyBtn.textContent = 'Copy Result',1200);
+      }).catch(()=> alert('Clipboard not available.'));
+    });
+
+    downloadBtn.addEventListener('click', ()=>{
+      const text = outputEl.textContent;
+      if(!text){ alert('No result to download.'); return; }
+      const rows = text.split(/\s*,\s*/);
+      const csv = rows.map(r => `"${r.replace(/"/g,'""')}"`).join("\n");
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'keywords_clean.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    clearBtn.addEventListener('click', ()=>{
+      inputEl.value = '';
+      outputEl.textContent = '';
+      countEl.textContent = '';
+    });
+
+    // quick demo data (optional) - comment out if not needed
+    // inputEl.value = "2023 diary,stationery,travel journal,personalized journal,personalised diary,leather bound journal,online diary,travel diary,\n5 year diary,diary planner,journal diary,leather diary,journal planner,daily diary,diary with lock\nstationery, travel journal, personalized journal, personalised diary";
+  </script>
+</body>
+</html>

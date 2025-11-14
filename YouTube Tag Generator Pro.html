@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube Tag Generator Pro – SEO Tags for Videos</title>
+<meta name="description" content="YouTube Tag Generator Pro – Generate SEO-friendly tags for YouTube videos quickly. Boost video discoverability and optimize your channel with ease.">
+<meta name="keywords" content="youtube tag generator, youtube seo tags, video keyword tags, youtube video tags, seo tags for youtube">
+<style>
+body{font-family:Arial,sans-serif;background:#f5f6fa;padding:20px;display:flex;justify-content:center;}
+.container{background:#fff;max-width:800px;width:100%;padding:20px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.08);}
+h1{text-align:center;color:#222;}
+textarea{width:100%;height:150px;padding:10px;margin:10px 0;border-radius:8px;border:1px solid #ccc;}
+input{width:100%;padding:10px;margin:5px 0;border-radius:8px;border:1px solid #ccc;}
+button{background:#ff0000;color:#fff;border:none;padding:10px 15px;border-radius:8px;cursor:pointer;margin:5px;font-weight:600;}
+button:hover{background:#cc0000;}
+#output{background:#eef;padding:15px;border-radius:8px;white-space:pre-wrap;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>YouTube Tag Generator Pro</h1>
+<p>Enter video title and keywords, and generate SEO-friendly YouTube tags automatically.</p>
+<input type="text" id="videoTitle" placeholder="Enter video title">
+<textarea id="keywords" placeholder="Enter keywords separated by comma or space"></textarea>
+<button onclick="generateTags()">Generate Tags</button>
+<button onclick="copyTags()">Copy Tags</button>
+<div id="output"></div>
+</div>
+
+<script>
+function generateTags(){
+  const title=document.getElementById('videoTitle').value.trim();
+  let keywords=document.getElementById('keywords').value.trim();
+  if(!title && !keywords){alert('Enter title or keywords');return;}
+  let tagSet=new Set();
+  if(title){
+    title.split(' ').forEach(word=>tagSet.add(word.toLowerCase()));
+  }
+  if(keywords){
+    keywords.split(/[, ]+/).forEach(word=>tagSet.add(word.toLowerCase()));
+  }
+  const tags=Array.from(tagSet);
+  document.getElementById('output').innerText=tags.join(', ');
+}
+function copyTags(){
+  const text=document.getElementById('output').innerText;
+  if(!text){alert('No tags to copy!');return;}
+  navigator.clipboard.writeText(text);
+  alert('YouTube tags copied!');
+}
+</script>
+</body>
+</html>

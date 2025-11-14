@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF to Word Converter Pro</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f9f9f9; padding:20px; }
+    .container { max-width:600px; margin:auto; background:#fff; padding:20px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1);}
+    input[type=file] { margin:15px 0; }
+    button { background:#0073e6; color:#fff; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; }
+    button:hover { background:#005bb5; }
+    .note { margin-top:15px; font-size:14px; color:#555; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📂 PDF to Word Converter Pro</h2>
+    <input type="file" id="pdfFile" accept="application/pdf">
+    <br>
+    <button onclick="convertPDF()">Convert to Word</button>
+    <p class="note">⚡ Note: Conversion will extract text only (no images/formatting).</p>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+  <script>
+    async function convertPDF() {
+      let file = document.getElementById("pdfFile").files[0];
+      if (!file) { alert("Please upload a PDF file."); return; }
+
+      let reader = new FileReader();
+      reader.onload = async function() {
+        let typedarray = new Uint8Array(this.result);
+        let pdf = await pdfjsLib.getDocument(typedarray).promise;
+        let textContent = "";
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+          let page = await pdf.getPage(i);
+          let text = await page.getTextContent();
+          text.items.forEach(item => textContent += item.str + " ");
+          textContent += "\n\n";
+        }
+
+        let blob = new Blob(
+          [`${textContent}`], 
+          { type: "application/msword" }
+        );
+        let link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "converted.doc";
+        link.click();
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RD Calculator - India</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .input-group {
+            transition: all 0.3s ease;
+        }
+        .input-group:hover {
+            transform: translateY(-2px);
+        }
+        .result-highlight {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+        .lang-selector {
+            position: relative;
+        }
+        .lang-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 100;
+            min-width: 150px;
+            display: none;
+        }
+        .lang-dropdown.show {
+            display: block;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-coins text-3xl"></i>
+                    <h1 class="text-2xl md:text-3xl font-bold" data-i18n="header.title">RD Calculator</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm md:text-base">
+                        <i class="fas fa-flag mr-2"></i><span data-i18n="header.country">India</span>
+                    </div>
+                    <div class="lang-selector">
+                        <button id="langButton" class="flex items-center space-x-2 bg-white bg-opacity-20 hover:bg-opacity-30 px-3 py-1 rounded-lg transition">
+                            <i class="fas fa-globe"></i>
+                            <span id="currentLang">EN</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="langDropdown" class="lang-dropdown">
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100" data-lang="en">English</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100" data-lang="hi">हिन्दी</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100" data-lang="bn">বাংলা</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100" data-lang="ta">தமிழ்</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100" data-lang="te">తెలుగు</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- RD Details Section -->
+        <section class="mb-8">
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <h2 class="text-xl font-semibold mb-6 flex items-center">
+                    <i class="fas fa-piggy-bank mr-3 text-purple-600"></i>
+                    <span data-i18n="rd.title">Recurring Deposit Details</span>
+                </h2>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Monthly Installment -->
+                    <div class="input-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-rupee-sign mr-2"></i><span data-i18n="rd.installment">Monthly Installment (₹)</span>
+                        </label>
+                        <input type="number" id="monthlyInstallment" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="10000" value="10000">
+                    </div>
+
+                    <!-- Interest Rate -->
+                    <div class="input-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-percentage mr-2"></i><span data-i18n="rd.interestRate">Interest Rate (% per annum)</span>
+                        </label>
+                        <input type="number" id="interestRate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="6.5" value="6.5" step="0.1">
+                    </div>
+
+                    <!-- Tenure -->
+                    <div class="input-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-calendar-alt mr-2"></i><span data-i18n="rd.tenure">Tenure (Years)</span>
+                        </label>
+                        <input type="number" id="tenure" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="5" value="5">
+                    </div>
+                </div>
+
+                <!-- Calculate Button -->
+                <div class="text-center mt-6">
+                    <button onclick="calculateRD()" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3 rounded-lg font-semibold text-lg hover:from-purple-700 hover:to-indigo-700 transform transition hover:scale-105 shadow-lg">
+                        <i class="fas fa-calculator mr-2"></i><span data-i18n="calculateBtn">Calculate RD</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="resultsSection" class="hidden mb-8">
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- RD Results -->
+                <div class="bg-white rounded-lg card-shadow p-6">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fas fa-chart-line mr-3 text-purple-600"></i>
+                        <span data-i18n="results.title">Maturity Details</span>
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between py-2 border-b">
+                            <span class="text-gray-600"><span data-i18n="results.totalInvestment">Total Investment</span>:</span>
+                            <span class="font-semibold" id="totalInvestment">₹0</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b">
+                            <span class="text-gray-600"><span data-i18n="results.interest">Total Interest</span>:</span>
+                            <span class="font-semibold" id="totalInterest">₹0</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b">
+                            <span class="text-gray-600"><span data-i18n="results.maturity">Maturity Amount</span>:</span>
+                            <span class="font-semibold text-lg" id="maturityAmount">₹0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Growth Chart -->
+                <div class="bg-white rounded-lg card-shadow p-6">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fas fa-chart-area mr-3 text-purple-600"></i>
+                        <span data-i18n="chart.title">RD Growth</span>
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="rdChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Yearly Breakup Table -->
+        <section id="yearlyBreakup" class="hidden">
+            <div class="bg-white rounded-lg card-shadow p-6 overflow-x-auto">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-table mr-3 text-purple-600"></i>
+                    <span data-i18n="table.title">Yearly Growth Breakup</span>
+                </h3>
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="table.year">Year</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="table.investment">Investment</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="table.interest">Interest Earned</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-i18n="table.balance">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="yearlyBreakupBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Table rows will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-sm">
+                <i class="fas fa-info-circle mr-2"></i>
+                <span data-i18n="footer.note">Note: This calculator provides only estimated calculations. Interest rates may vary based on bank and tenure.</span>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Translations for different languages
+        const translations = {
+            en: {
+                "header.title": "RD Calculator",
+                "header.country": "India",
+                "rd.title": "Recurring Deposit Details",
+                "rd.installment": "Monthly Installment (₹)",
+                "rd.interestRate": "Interest Rate (% per annum)",
+                "rd.tenure": "Tenure (Years)",
+                "calculateBtn": "Calculate RD",
+                "results.title": "Maturity Details",
+                "results.totalInvestment": "Total Investment",
+                "results.interest": "Total Interest",
+                "results.maturity": "Maturity Amount",
+                "chart.title": "RD Growth",
+                "table.title": "Yearly Growth Breakup",
+                "table.year": "Year",
+                "table.investment": "Investment",
+                "table.interest": "Interest Earned",
+                "table.balance": "Balance",
+                "footer.note": "Note: This calculator provides only estimated calculations. Interest rates may vary based on bank and tenure."
+            },
+            hi: {
+                "header.title": "आरडी कैलकुलेटर",
+                "header.country": "भारत",
+                "rd.title": "रिकरिंग डिपॉजिट विवरण",
+                "rd.installment": "मासिक किस्त (₹)",
+                "rd.interestRate": "ब्याज दर (% प्रति वर्ष)",
+                "rd.tenure": "अवधि (वर्ष)",
+                "calculateBtn": "आरडी कैलकुलेट करें",
+                "results.title": "परिपक्वता विवरण",
+                "results.totalInvestment": "कुल निवेश",
+                "results.interest": "कुल ब्याज",
+                "results.maturity": "परिपक्वता राशि",
+                "chart.title": "आरडी वृद्धि",
+                "table.title": "वार्षिक वृद्धि विवरण",
+                "table.year": "वर्ष",
+                "table.investment": "निवेश",
+                "table.interest": "अर्जित ब्याज",
+                "table.balance": "शेष राशि",
+                "footer.note": "नोट: यह कैलकुलेटर केवल अनुमानित गणना प्रदान करता है। ब्याज दरें बैंक और अवधि के आधार पर भिन्न हो सकती हैं।"
+            },
+            bn: {
+                "header.title": "আরডি ক্যালকুলেটর",
+                "header.country": "ভারত",
+                "rd.title": "পুনরাবৃত্তি আমানতের বিবরণ",
+                "rd.installment": "মাসিক কিস্তি (₹)",
+                "rd.interestRate": "সুদের হার (% প্রতি বছর)",
+                "rd.tenure": "মেয়াদ (বছর)",
+                "calculateBtn": "আরডি গণনা করুন",
+                "results.title": "পরিপক্কতার বিবরণ",
+                "results.totalInvestment": "মোট বিনিয়োগ",
+                "results.interest": "মোট সুদ",
+                "results.maturity": "পরিপক্কতার পরিমাণ",
+                "chart.title": "আরডি বৃদ্ধি",
+                "table.title": "বার্ষিক বৃদ্ধি ব্রেকআপ",
+                "table.year": "বছর",
+                "table.investment": "বিনিয়োগ",
+                "table.interest": "উপার্জিত সুদ",
+                "table.balance": "ব্যালেন্স",
+                "footer.note": "নোট: এই ক্যালকুলেটর শুধুমাত্র আনুমানিক গণনা প্রদান করে। সুদের হার ব্যাংক এবং মেয়াদ অনুযায়ী পরিবর্তিত হতে পারে।"
+            },
+            ta: {
+                "header.title": "ஆர்டி கணக்கீடு",
+                "header.country": "இந்தியா",
+                "rd.title": "தொடர் வைப்பு விவரங்கள்",
+                "rd.installment": "மாதாந்திர தவணை (₹)",
+                "rd.interestRate": "வட்டி விகிதம் (% ஆண்டுக்கு)",
+                "rd.tenure": "காலம் (ஆண்டுகள்)",
+                "calculateBtn": "ஆர்டி கணக்கிடுங்கள்",
+                "results.title": "மென்மை விவரங்கள்",
+                "results.totalInvestment": "மொத்த முதலீடு",
+                "results.interest": "மொத்த வட்டி",
+                "results.maturity": "மென்மை தொகை",
+                "chart.title": "ஆர்டி வளர்ச்சி",
+                "table.title": "ஆண்டு வளர்ச்சி விவரங்கள்",
+                "table.year": "ஆண்டு",
+                "table.investment": "முதலீடு",
+                "table.interest": "சம்பாதித வட்டி",
+                "table.balance": "இருப்பு",
+                "footer.note": "குறிப்பு: இந்த கணக்கீடு மட்டுமே மதிப்பீட்டு கணக்கீடுகளை வழங்குகிறது. வட்டி விகிதங்கள் வங்கி மற்றும் காலத்தைப் பொறுத்து மாறுபடலாம்."
+            },
+            te: {
+                "header.title": "ఆర్‌డి క్యాలిక్యులేటర్",
+                "header.country": "భారతదేశం",
+                "rd.title": "రికరింగ్ డిపాజిట్ వివరాలు",
+                "rd.installment": "నెలసరి వాయిపోత (₹)",
+                "rd.interestRate": "వడ్డీ రేటు (% సంవత్సరానికి)",
+                "rd.tenure": "కాలం (సంవత్సరాలు)",
+                "calculateBtn": "ఆర్‌డి లెక్కించండి",
+                "results.title": "పరిపక్వత వివరాలు",
+                "results.totalInvestment": "మొత్తం పెట్టుబడి",
+                "results.interest": "మొత్తం వడ్డీ",
+                "results.maturity": "పరిపక్వత మొత్తం",
+                "chart.title": "ఆర్‌డి వృద్ధి",
+                "table.title": "వార్షిక వృద్ధి వివరాలు",
+                "table.year": "సంవత్సరం",
+                "table.investment": "పెట్టుబడి",
+                "table.interest": "సంపాదించిన వడ్డీ",
+                "table.balance": "బ్యాలెన్స్",
+                "footer.note": "గమనిక: ఈ క్యాలిక్యులేటర్ అంచనా లెక్కలను మాత్రమే అందిస్తుంది. వడ్డీ రేట్లు బ్యాంకు మరియు కాలం ఆధారంగా మారవచ్చు."
+            }
+        };
+
+        // Current language
+        let currentLanguage = 'en';
+
+        // Language selector functionality
+        document.getElementById('langButton').addEventListener('click', function() {
+            document.getElementById('langDropdown').classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', function(event) {
+            if (!event.target.matches('#langButton') && !event.target.closest('#langButton')) {
+                document.getElementById('langDropdown').classList.remove('show');
+            }
+        });
+
+        // Language selection
+        document.querySelectorAll('#langDropdown a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const lang = this.getAttribute('data-lang');
+                setLanguage(lang);
+                document.getElementById('langDropdown').classList.remove('show');
+            });
+        });
+
+        // Function to set language
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.getElementById('currentLang').textContent = lang.toUpperCase();
+            
+            // Update all elements with data-i18n attribute
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+
+            // Store language preference
+            localStorage.setItem('preferredLanguage', lang);
+        }
+
+        // Load saved language preference
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedLang = localStorage.getItem('preferredLanguage');
+            if (savedLang && translations[savedLang]) {
+                setLanguage(savedLang);
+            }
+        });
+
+        // RD Calculation
+        let rdChart = null;
+
+        function calculateRD() {
+            // Get input values
+            const monthlyInstallment = parseFloat(document.getElementById('monthlyInstallment').value) || 0;
+            const rate = parseFloat(document.getElementById('interestRate').value) || 0;
+            const tenure = parseFloat(document.getElementById('tenure').value) || 0;
+
+            // Convert tenure to months
+            const tenureMonths = tenure * 12;
+            
+            // Calculate monthly interest rate
+            const monthlyRate = rate / 100 / 12;
+            
+            // Calculate maturity amount using RD formula
+            let maturityAmount = 0;
+            for (let i = 1; i <= tenureMonths; i++) {
+                maturityAmount += monthlyInstallment * Math.pow(1 + monthlyRate, tenureMonths - i + 1);
+            }
+            
+            // Calculate total investment and interest
+            const totalInvestment = monthlyInstallment * tenureMonths;
+            const totalInterest = maturityAmount - totalInvestment;
+
+            // Display results
+            document.getElementById('totalInvestment').textContent = formatCurrency(totalInvestment);
+            document.getElementById('totalInterest').textContent = formatCurrency(totalInterest);
+            document.getElementById('maturityAmount').textContent = formatCurrency(maturityAmount);
+
+            // Show results section
+            document.getElementById('resultsSection').classList.remove('hidden');
+
+            // Create growth chart
+            createGrowthChart(monthlyInstallment, maturityAmount, tenure);
+
+            // Generate yearly breakup table
+            generateYearlyBreakup(monthlyInstallment, rate, tenure);
+        }
+
+        function createGrowthChart(installment, maturity, tenure) {
+            const ctx = document.getElementById('rdChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (rdChart) {
+                rdChart.destroy();
+            }
+
+            // Generate data points for each year
+            const labels = [];
+            const data = [];
+            
+            for (let year = 0; year <= tenure; year++) {
+                labels.push(`Year ${year}`);
+                // Calculate amount for each year
+                if (year === 0) {
+                    data.push(0);
+                } else {
+                    let amount = 0;
+                    const months = year * 12;
+                    const monthlyRate = parseFloat(document.getElementById('interestRate').value) / 100 / 12;
+                    
+                    for (let i = 1; i <= months; i++) {
+                        amount += installment * Math.pow(1 + monthlyRate, months - i + 1);
+                    }
+                    data.push(amount);
+                }
+            }
+
+            // Create new chart
+            rdChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'RD Value',
+                        data: data,
+                        backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                        pointBorderColor: '#fff',
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Value: ${formatCurrency(context.raw)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return formatCurrency(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateYearlyBreakup(monthlyInstallment, rate, tenure) {
+            const yearlyBreakupBody = document.getElementById('yearlyBreakupBody');
+            yearlyBreakupBody.innerHTML = '';
+
+            let balance = 0;
+            const monthlyRate = rate / 100 / 12;
+            
+            for (let year = 1; year <= tenure; year++) {
+                // Calculate investment for the year
+                const yearlyInvestment = monthlyInstallment * 12;
+                
+                // Calculate interest for the year
+                let yearlyInterest = 0;
+                
+                for (let month = 1; month <= 12; month++) {
+                    const totalMonths = (year - 1) * 12 + month;
+                    const monthsRemaining = tenure * 12 - totalMonths + 1;
+                    
+                    // Calculate interest for this month's installment
+                    const monthInterest = monthlyInstallment * monthlyRate * monthsRemaining;
+                    yearlyInterest += monthInterest;
+                }
+                
+                // Update balance
+                balance += yearlyInvestment + yearlyInterest;
+                
+                // Create table row
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${year}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatCurrency(yearlyInvestment)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatCurrency(yearlyInterest)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatCurrency(balance)}</td>
+                `;
+                
+                yearlyBreakupBody.appendChild(row);
+            }
+
+            // Show yearly breakup section
+            document.getElementById('yearlyBreakup').classList.remove('hidden');
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Add input validation
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value < 0) this.value = 0;
+            });
+        });
+    </script>
+</body>
+</html>

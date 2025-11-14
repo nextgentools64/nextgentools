@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Regex Tester — Storedropship Tool</title>
+<meta name="description" content="Test and validate regular expressions (regex) online. Input test text, write regex, see matches, and replace results. Copy or download outputs easily." />
+<meta name="keywords" content="Regex tester, test regex, validate regular expressions, regex online, regex match, regex replace" />
+<style>
+:root{--bg:#f9fafb;--card:#fff;--muted:#6b7280;--accent:#0ea5a4}
+*{box-sizing:border-box;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif}
+body{margin:0;padding:20px;background:linear-gradient(180deg,var(--bg),#eef2ff);color:#111827}
+.wrap{max-width:960px;margin:0 auto}
+.card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.05);margin-bottom:14px}
+h1{margin-bottom:6px;font-size:20px}
+p.lead{margin:0 0 12px;color:var(--muted)}
+textarea,input{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef6;font-size:14px;margin-top:8px;resize:vertical}
+.controls{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+button.primary{background:var(--accent);color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer}
+button.alt{background:#fff;border:1px solid #e6eef6;color:#0b5394;padding:10px;border-radius:8px}
+pre{background:#f8fafc;padding:12px;border-radius:8px;border:1px solid #e6e9ef;overflow:auto;max-height:320px;white-space:pre-wrap;word-wrap:break-word}
+.meta{font-size:13px;color:var(--muted);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card">
+<h1>Regex Tester</h1>
+<p class="lead">Test and validate your regular expressions (regex) against sample text. View matches, perform replacements, and copy or download results.</p>
+
+<label for="regexInput">Regex Pattern</label>
+<input id="regexInput" placeholder="e.g., \b\w+\b" />
+<label for="testInput">Test Text</label>
+<textarea id="testInput" placeholder="Enter text to test regex..."></textarea>
+<label for="replaceInput">Replacement (optional)</label>
+<input id="replaceInput" placeholder="Text to replace matches" />
+
+<div class="controls">
+<button class="primary" id="testBtn">Test Regex</button>
+<button class="alt" id="copyBtn">Copy Output</button>
+<button class="alt" id="downloadBtn">Download</button>
+<button class="alt" id="clearBtn">Clear</button>
+</div>
+<label>Output / Matches</label>
+<pre id="output">No output yet. Click Test Regex.</pre>
+<div class="meta">Tip: Use flags like 'g' for global, 'i' for case-insensitive, 'm' for multiline.</div>
+</div>
+<div class="card">
+<h2>Description</h2>
+<p style="margin:0;color:#374151;line-height:1.6">This Regex Tester allows developers, testers, and students to quickly validate regular expressions online. Key features include:</p>
+<ul style="margin-top:6px;color:#374151">
+<li>Test regex patterns against sample text.</li>
+<li>View matched results or replaced text.</li>
+<li>Copy output to clipboard or download as a .txt file.</li>
+<li>Lightweight, browser-based, and offline-ready.</li>
+</ul>
+</div>
+</div>
+<script>
+const regexInput = document.getElementById('regexInput');
+const testInput = document.getElementById('testInput');
+const replaceInput = document.getElementById('replaceInput');
+const output = document.getElementById('output');
+const testBtn = document.getElementById('testBtn');
+const copyBtn = document.getElementById('copyBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const clearBtn = document.getElementById('clearBtn');
+
+testBtn.addEventListener('click',()=>{
+  const pattern = regexInput.value;
+  const text = testInput.value;
+  const replace = replaceInput.value;
+  if(!pattern){output.textContent='Enter a regex pattern'; return;}
+  try{
+    const regex = new RegExp(pattern,'g');
+    const matches = text.match(regex) || [];
+    const replaced = replace? text.replace(regex,replace) : text;
+    output.textContent='Matches:\n'+JSON.stringify(matches,null,2)+'\n\nResult:\n'+replaced;
+  }catch(e){output.textContent='Regex Error: '+e.message;}
+});
+
+copyBtn.addEventListener('click',async()=>{
+  try{await navigator.clipboard.writeText(output.textContent);alert('Copied!');}catch(e){alert('Copy failed');}
+});
+
+downloadBtn.addEventListener('click',()=>{
+  const text = output.textContent;
+  if(!text) return alert('Nothing to download');
+  const blob = new Blob([text],{type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='regex_output.txt'; a.click(); URL.revokeObjectURL(url);
+});
+
+clearBtn.addEventListener('click',()=>{regexInput.value=''; testInput.value=''; replaceInput.value=''; output.textContent='';});
+</script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Plagiarism Checker — Storedropship Tool</title>
+  <meta name="description" content="Free Plagiarism Checker tool. Compare two texts offline, check similarity percentage, highlight matches. Copy-paste ready HTML file with API-ready structure." />
+  <style>
+    :root{--bg:#f6f9ff;--card:#fff;--muted:#6b7280;--accent:#0ea5a4}
+    *{box-sizing:border-box;font-family:Segoe UI,Roboto,Arial,sans-serif}
+    body{margin:0;background:linear-gradient(180deg,var(--bg),#eef2ff);padding:28px;color:#111827}
+    .wrap{max-width:960px;margin:0 auto}
+    .card{background:var(--card);padding:18px;border-radius:10px;box-shadow:0 8px 26px rgba(8,15,52,0.06);margin-bottom:18px}
+    h1{margin:0 0 6px;font-size:22px}
+    p.lead{margin:0 0 12px;color:var(--muted)}
+    textarea{width:100%;min-height:160px;border:1px solid #e6e9ef;border-radius:8px;padding:12px;font-family:monospace;font-size:14px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    button{padding:10px 14px;border-radius:8px;border:none;background:var(--accent);color:white;cursor:pointer}
+    button.alt{background:#e6eef6;color:#0b5394}
+    .out{margin-top:14px;padding:12px;border-radius:8px;background:#f8fafc;border:1px dashed #e5e7eb;white-space:pre-wrap}
+    .small{font-size:13px;color:var(--muted);margin-top:8px}
+    @media(max-width:720px){.row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Plagiarism Checker</h1>
+      <p class="lead">Check similarity between two pieces of text. Offline demo — shows % match instantly. API integration ready for Grammarly/Copyscape etc.</p>
+
+      <div class="row">
+        <div>
+          <label>Text A</label>
+          <textarea id="textA" placeholder="Paste original text here..."></textarea>
+        </div>
+        <div>
+          <label>Text B</label>
+          <textarea id="textB" placeholder="Paste text to check here..."></textarea>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <button id="check">Check Similarity</button>
+        <button id="clear" class="alt">Clear</button>
+      </div>
+
+      <div id="result" class="out">Result will appear here.</div>
+      <div class="small">Note: This is a simple local comparison demo. For accurate plagiarism detection, connect to a real plagiarism API.</div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:18px;margin-bottom:6px">Description</h2>
+      <p style="margin:0;color:#374151;line-height:1.6">
+        This Plagiarism Checker compares two texts and calculates their similarity percentage by checking common words. It’s designed as an offline demo tool that runs fully in your browser, without any server or database.
+      </p>
+      <ul style="margin-top:10px;color:#374151">
+        <li><b>Instant check:</b> Compare text A vs text B.</li>
+        <li><b>Percentage match:</b> Shows how much content overlaps.</li>
+        <li><b>Offline demo:</b> No server required. Just copy-paste & run.</li>
+        <li><b>Extendable:</b> You can later connect real APIs (Grammarly, Copyscape) here.</li>
+        <li><b>Use case:</b> Bloggers, students, teachers, and professionals checking originality.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const btn = document.getElementById('check');
+    const btnClear = document.getElementById('clear');
+    const textA = document.getElementById('textA');
+    const textB = document.getElementById('textB');
+    const result = document.getElementById('result');
+
+    function checkSimilarity(){
+      const a = textA.value.trim();
+      const b = textB.value.trim();
+      if(!a || !b){ result.textContent = 'Please paste text in both boxes.'; return; }
+
+      const wordsA = a.toLowerCase().split(/\\W+/).filter(Boolean);
+      const wordsB = b.toLowerCase().split(/\\W+/).filter(Boolean);
+
+      const setA = new Set(wordsA);
+      const common = wordsB.filter(w => setA.has(w));
+      const percent = (common.length / Math.max(wordsA.length, wordsB.length) * 100).toFixed(2);
+
+      result.textContent = `Similarity: ${percent}%\\nCommon words found: ${common.length}`;
+    }
+
+    btn.addEventListener('click', checkSimilarity);
+    btnClear.addEventListener('click', ()=>{ textA.value=''; textB.value=''; result.textContent='Result will appear here.'; });
+  </script>
+</body>
+</html>

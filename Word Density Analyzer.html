@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Density Analyzer – Storedropship.in</title>
+<style>
+  body{font-family:'Poppins',sans-serif;background:#f5faff;margin:0;}
+  header{background:#007acc;color:#fff;text-align:center;padding:20px;}
+  .container{max-width:800px;background:#fff;margin:30px auto;padding:25px;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,0.1);}
+  textarea{width:100%;height:200px;border:1px solid #ccc;border-radius:8px;padding:15px;}
+  button{background:#007acc;color:#fff;padding:12px 20px;border:none;border-radius:8px;cursor:pointer;margin-top:10px;font-weight:600;}
+  button:hover{background:#005fa3;}
+  table{width:100%;border-collapse:collapse;margin-top:20px;}
+  th,td{border:1px solid #ddd;padding:10px;text-align:left;}
+  th{background:#f0f8ff;}
+</style>
+</head>
+<body>
+<header><h1>📊 Word Density Analyzer</h1></header>
+
+<div class="container">
+  <textarea id="text" placeholder="Paste or type your content here..."></textarea>
+  <button onclick="analyze()">Analyze Density</button>
+  <table id="resultTable"></table>
+</div>
+
+<script>
+function analyze(){
+  const text=document.getElementById('text').value.toLowerCase().replace(/[^a-z\s]/g,'');
+  const words=text.split(/\s+/).filter(Boolean);
+  const freq={};
+  words.forEach(w=>freq[w]=(freq[w]||0)+1);
+  const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,20);
+  let html="<tr><th>Word</th><th>Count</th><th>Density (%)</th></tr>";
+  sorted.forEach(([word,count])=>{
+    html+=`<tr><td>${word}</td><td>${count}</td><td>${((count/words.length)*100).toFixed(2)}</td></tr>`;
+  });
+  document.getElementById('resultTable').innerHTML=html;
+}
+</script>
+
+<footer style="background:#007acc;color:white;text-align:center;padding:10px;margin-top:30px;">© 2025 Storedropship.in | Sheetal Sahu</footer>
+</body>
+</html>
