@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Business Loan Calculator — Storedropship</title>
+  <meta name="description" content="Simple Business Loan / EMI Calculator. Calculate monthly EMI, total interest and total payment." />
+  <style>
+    :root{
+      --card-bg:#ffffff;
+      --accent:#0b78d1;
+      --muted:#666;
+      --shadow: 0 6px 20px rgba(11,120,209,0.08);
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:#f4f7fb;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+    .card{
+      width:100%;
+      max-width:920px;
+      background:var(--card-bg);
+      border-radius:12px;
+      box-shadow:var(--shadow);
+      padding:20px;
+    }
+    h1{margin:0 0 8px;font-size:20px}
+    p.lead{margin:0 0 18px;color:var(--muted);font-size:14px}
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 380px;
+      gap:18px;
+    }
+    @media (max-width:880px){
+      .grid{grid-template-columns:1fr}
+    }
+    .form{
+      background:#fbfdff;padding:14px;border-radius:8px;border:1px solid #eef5fc;
+    }
+    .row{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    input[type="number"], select{
+      width:100%;
+      padding:10px 12px;border-radius:6px;border:1px solid #dfe9f5;background:white;
+      font-size:15px;
+    }
+    .inline{display:flex;gap:8px}
+    .btn{
+      display:inline-block;padding:10px 12px;border-radius:8px;border:0;background:var(--accent);color:white;
+      cursor:pointer;font-weight:600;
+    }
+    .btn.secondary{background:#eef5fc;color:var(--accent);border:1px solid #d7eafc}
+    .results{
+      background:linear-gradient(180deg,#fff 0%,#fbfbff 100%);padding:16px;border-radius:8px;border:1px solid #eef2ff;
+    }
+    .tile{padding:10px;border-radius:8px;background:#fff;margin-bottom:10px;border:1px solid #f0f7ff}
+    .tile h3{margin:0;font-size:16px}
+    .tile p{margin:6px 0 0;font-size:18px;font-weight:700}
+    .small{font-size:13px;color:var(--muted)}
+    .amort-table{width:100%;border-collapse:collapse;margin-top:12px}
+    .amort-table th, .amort-table td{padding:8px;border:1px solid #eef4fb;font-size:13px;text-align:right}
+    .amort-table th{text-align:center;background:#f7fbff}
+    .footer-notes{margin-top:12px;font-size:13px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="card" id="loan-calculator">
+    <h1>Business Loan Calculator</h1>
+    <p class="lead">Loan amount, वार्षिक ब्याज़ दर और अवधि डालकर EMI, कुल ब्याज़ और कुल भुगतान पता करें.</p>
+
+    <div class="grid">
+      <!-- LEFT: INPUTS -->
+      <div class="form">
+        <div class="row">
+          <div style="flex:1">
+            <label>Loan Amount (₹)</label>
+            <input id="loanAmount" type="number" min="0" step="0.01" placeholder="उदा. 500000" value="500000">
+          </div>
+          <div style="width:140px">
+            <label>Currency</label>
+            <select id="currency">
+              <option value="₹">₹ INR</option>
+              <option value="$">$ USD</option>
+              <option value="€">€ EUR</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div style="flex:1">
+            <label>Annual Interest Rate (%)</label>
+            <input id="annualRate" type="number" min="0" step="0.01" placeholder="उदा. 10.5" value="10.5">
+          </div>
+          <div style="width:140px">
+            <label>Processing Fee (%)</label>
+            <input id="procFee" type="number" min="0" step="0.01" placeholder="Optional" value="0">
+          </div>
+        </div>
+
+        <div class="row">
+          <div style="flex:1">
+            <label>Tenure</label>
+            <div class="inline">
+              <input id="tenureValue" type="number" min="1" step="1" placeholder="Duration" value="3">
+              <select id="tenureUnit">
+                <option value="years">Years</option>
+                <option value="months">Months</option>
+              </select>
+            </div>
+          </div>
+          <div style="width:140px">
+            <label>Repayment Frequency</label>
+            <select id="freq">
+              <option value="monthly">Monthly</option>
+              <!-- Future: weekly/bi-weekly -->
+            </select>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:8px">
+          <button class="btn" id="calcBtn">Calculate EMI</button>
+          <button class="btn secondary" id="resetBtn" type="button">Reset</button>
+          <button class="btn secondary" id="toggleAmort" type="button">Show Amortization</button>
+        </div>
+
+        <div class="footer-notes">
+          <div class="small">Note: EMI formula assumes fixed interest rate and equal monthly installments.</div>
+        </div>
+      </div>
+
+      <!-- RIGHT: RESULTS -->
+      <div class="results">
+        <div class="tile">
+          <h3>Monthly EMI</h3>
+          <p id="emiDisplay">—</p>
+          <div class="small">आपका मासिक क़िस्त</div>
+        </div>
+
+        <div class="tile">
+          <h3>Total Interest</h3>
+          <p id="totalInterest">—</p>
+          <div class="small">कुल ब्याज़ (loan पर)</div>
+        </div>
+
+        <div class="tile">
+          <h3>Total Payment (Principal + Interest)</h3>
+          <p id="totalPayment">—</p>
+          <div class="small">कुल चुकाया जाने वाला</div>
+        </div>
+
+        <div style="margin-top:8px">
+          <button class="btn" id="copyBtn">Copy Summary</button>
+          <button class="btn secondary" id="downloadCsv">Download Amortization CSV</button>
+        </div>
+
+        <div id="amortSection" style="display:none;margin-top:12px">
+          <h3 style="margin:8px 0 10px">Amortization Schedule</h3>
+          <div style="max-height:260px;overflow:auto;border-radius:6px;padding-bottom:8px">
+            <table class="amort-table" id="amortTable">
+              <thead>
+                <tr>
+                  <th>Inst#</th>
+                  <th>Payment</th>
+                  <th>Principal</th>
+                  <th>Interest</th>
+                  <th>Balance</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Helper: format currency
+    function fmt(value, symbol){
+      if (isNaN(value) || !isFinite(value)) return '—';
+      // show with 2 decimals and thousand separators
+      return symbol + Number(value).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+    }
+
+    // EMI calculation logic
+    function calculateEMI(P, annualRate, months){
+      if (months <= 0) return {emi:0, totalPay:0, totalInterest:0, schedule:[]};
+      var r = annualRate / 12 / 100; // monthly rate
+      var emi;
+      if (r === 0){
+        emi = P / months;
+      } else {
+        var x = Math.pow(1 + r, months);
+        emi = P * r * x / (x - 1);
+      }
+      var totalPay = emi * months;
+      var totalInterest = totalPay - P;
+
+      // build amortization schedule (per month)
+      var balance = P;
+      var schedule = [];
+      for (var i=1;i<=months;i++){
+        var interest = (r === 0) ? 0 : balance * r;
+        var principal = emi - interest;
+        // handle final rounding adjustments
+        if (i === months){
+          principal = balance;
+          emi = principal + interest;
+        }
+        balance = Math.max(0, balance - principal);
+        schedule.push({
+          inst: i,
+          payment: emi,
+          principal: principal,
+          interest: interest,
+          balance: balance
+        });
+      }
+
+      return {emi:emi, totalPay:totalPay, totalInterest:totalInterest, schedule:schedule};
+    }
+
+    // UI bindings
+    document.getElementById('calcBtn').addEventListener('click', doCalc);
+    document.getElementById('resetBtn').addEventListener('click', resetForm);
+    document.getElementById('toggleAmort').addEventListener('click', toggleAmort);
+    document.getElementById('copyBtn').addEventListener('click', copySummary);
+    document.getElementById('downloadCsv').addEventListener('click', downloadCSV);
+
+    function doCalc(){
+      var P = parseFloat(document.getElementById('loanAmount').value) || 0;
+      var annual = parseFloat(document.getElementById('annualRate').value) || 0;
+      var tenureVal = parseInt(document.getElementById('tenureValue').value) || 0;
+      var unit = document.getElementById('tenureUnit').value;
+      var currency = document.getElementById('currency').value || '₹';
+      var procFeePercent = parseFloat(document.getElementById('procFee').value) || 0;
+
+      var months = (unit === 'years') ? tenureVal * 12 : tenureVal;
+      if (months <= 0 || P <= 0){
+        alert('कृपया सही Loan amount और Tenure दर्ज करें।');
+        return;
+      }
+
+      // processing fee applied once on principal (optional)
+      var procFee = (procFeePercent > 0) ? (P * procFeePercent / 100) : 0;
+      var principalToUse = P; // we keep principal for EMI calculation as original loan; proc fee shown separately if needed
+
+      var res = calculateEMI(principalToUse, annual, months);
+
+      // update UI
+      document.getElementById('emiDisplay').innerText = fmt(res.emi, currency);
+      document.getElementById('totalInterest').innerText = fmt(res.totalInterest, currency) + (procFee ? ('  (Processing fee: ' + fmt(procFee, currency) + ')') : '');
+      document.getElementById('totalPayment').innerText = fmt(res.totalPay + procFee, currency);
+
+      // fill amortization table
+      fillAmortTable(res.schedule, currency);
+
+      // show amort section if visible
+      var amortSec = document.getElementById('amortSection');
+      if (amortSec.style.display !== 'none'){
+        amortSec.style.display = 'block';
+      }
+    }
+
+    function fillAmortTable(schedule, currency){
+      var tbody = document.querySelector('#amortTable tbody');
+      tbody.innerHTML = '';
+      if (!schedule || schedule.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">—</td></tr>';
+        return;
+      }
+      schedule.forEach(function(row){
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td style="text-align:center">'+row.inst+'</td>' +
+                       '<td>'+fmt(row.payment, currency)+'</td>' +
+                       '<td>'+fmt(row.principal, currency)+'</td>' +
+                       '<td>'+fmt(row.interest, currency)+'</td>' +
+                       '<td>'+fmt(row.balance, currency)+'</td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    function resetForm(){
+      document.getElementById('loanAmount').value = 500000;
+      document.getElementById('annualRate').value = 10.5;
+      document.getElementById('tenureValue').value = 3;
+      document.getElementById('tenureUnit').value = 'years';
+      document.getElementById('procFee').value = 0;
+      document.getElementById('emiDisplay').innerText = '—';
+      document.getElementById('totalInterest').innerText = '—';
+      document.getElementById('totalPayment').innerText = '—';
+      document.querySelector('#amortTable tbody').innerHTML = '';
+    }
+
+    function toggleAmort(){
+      var sect = document.getElementById('amortSection');
+      if (sect.style.display === 'none' || !sect.style.display){
+        sect.style.display = 'block';
+        document.getElementById('toggleAmort').innerText = 'Hide Amortization';
+      } else {
+        sect.style.display = 'none';
+        document.getElementById('toggleAmort').innerText = 'Show Amortization';
+      }
+    }
+
+    function copySummary(){
+      var emi = document.getElementById('emiDisplay').innerText;
+      var totInt = document.getElementById('totalInterest').innerText;
+      var totPay = document.getElementById('totalPayment').innerText;
+      var loan = document.getElementById('loanAmount').value;
+      var rate = document.getElementById('annualRate').value;
+      var t = document.getElementById('tenureValue').value + ' ' + document.getElementById('tenureUnit').value;
+      var text = 'Business Loan Summary\n' +
+                 'Loan Amount: ' + loan + '\n' +
+                 'Interest Rate (annual): ' + rate + '%\n' +
+                 'Tenure: ' + t + '\n\n' +
+                 'Monthly EMI: ' + emi + '\n' +
+                 'Total Interest: ' + totInt + '\n' +
+                 'Total Payment: ' + totPay + '\n' +
+                 '\n(Calculated by Business Loan Calculator)';
+      navigator.clipboard.writeText(text).then(function(){
+        alert('Summary copied to clipboard!');
+      }, function(){
+        alert('Copy failed — please copy manually.');
+      });
+    }
+
+    function downloadCSV(){
+      var tbody = document.querySelectorAll('#amortTable tbody tr');
+      if (tbody.length === 0){
+        alert('Please calculate first to generate amortization schedule.');
+        return;
+      }
+      // build CSV from schedule array (we can reuse calculateEMI to get schedule)
+      var P = parseFloat(document.getElementById('loanAmount').value) || 0;
+      var annual = parseFloat(document.getElementById('annualRate').value) || 0;
+      var tenureVal = parseInt(document.getElementById('tenureValue').value) || 0;
+      var unit = document.getElementById('tenureUnit').value;
+      var months = (unit === 'years') ? tenureVal * 12 : tenureVal;
+      var currency = document.getElementById('currency').value || '₹';
+      var res = calculateEMI(P, annual, months);
+      if (!res.schedule || res.schedule.length===0){
+        alert('Amortization data not available.');
+        return;
+      }
+      var rows = [
+        ['Inst#','Payment ('+currency+')','Principal ('+currency+')','Interest ('+currency+')','Balance ('+currency+')']
+      ];
+      res.schedule.forEach(function(r){
+        rows.push([r.inst, r.payment.toFixed(2), r.principal.toFixed(2), r.interest.toFixed(2), r.balance.toFixed(2)]);
+      });
+      var csvContent = rows.map(e => e.join(",")).join("\n");
+      var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'amortization_schedule.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // initialize: hide amort table and set defaults
+    (function init(){
+      document.getElementById('amortSection').style.display = 'none';
+      // initial calculate for sample values
+      doCalc();
+    })();
+  </script>
+</body>
+</html>

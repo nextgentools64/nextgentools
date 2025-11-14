@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Font Pairing Tool — Storedropship</title>
+  <meta name="description" content="Font Pairing Tool: choose heading and body fonts, preview samples, get CSS snippets and pairing suggestions inspired by W3Schools font resources." />
+  <meta name="keywords" content="font pairing, font combinations, Google Fonts, W3Schools, typography tool, font preview, CSS snippet" />
+  <style>
+    :root{--bg:#f7fafc;--card:#fff;--muted:#6b7280;--accent:#0ea5a4}
+    *{box-sizing:border-box;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif}
+    body{margin:0;background:linear-gradient(180deg,var(--bg),#eef2ff);padding:20px;color:#0f172a}
+    .wrap{max-width:1100px;margin:0 auto}
+    .card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 8px 30px rgba(10,20,40,0.06);margin-bottom:14px}
+    h1{margin:0 0 6px;font-size:20px}
+    p.lead{margin:0 0 12px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    label{font-size:13px;color:#374151}
+    select,input,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef6;font-size:14px}
+    .controls{display:flex;gap:10px;align-items:center;margin-top:10px}
+    button{padding:10px 12px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer}
+    button.alt{background:#fff;border:1px solid #e6eef6;color:#0b5394}
+    .preview{padding:14px;border-radius:10px;border:1px solid #e6e9ef;background:#fff;min-height:220px}
+    .pair-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .chip{padding:8px 10px;border-radius:10px;background:#f3f4f6;font-size:13px}
+    .meta{font-size:13px;color:var(--muted);margin-top:10px}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Font Pairing Tool</h1>
+      <p class="lead">Pick fonts for headings and body text, preview live samples, and get ready-to-use CSS snippets. Inspired by W3Schools typography guidance and built to accept Google Fonts links for production use.</p>
+      <div class="grid">
+        <div>
+          <label for="headingFont">Heading Font (choose or enter Google Font)</label>
+          <select id="headingFont"></select>
+          <label for="bodyFont" style="margin-top:8px">Body Font (choose or enter Google Font)</label>
+          <select id="bodyFont"></select>
+
+          <label for="customLink" style="margin-top:8px">Add custom Google Fonts link (optional)</label>
+          <input id="customLink" placeholder="Paste Google Fonts &lt;link&gt; href or @import URL here" />
+
+          <div class="controls">
+            <button id="apply">Apply</button>
+            <button id="swap" class="alt">Swap</button>
+            <button id="copyCss" class="alt">Copy CSS</button>
+            <button id="downloadCss" class="alt">Download CSS</button>
+          </div>
+
+          <div class="meta">Tip: Use a distinctive display font for headings and a readable sans-serif or serif for body. W3Schools recommends balancing contrast and readability.</div>
+        </div>
+        <div>
+          <div class="preview" id="preview">
+            <h2 id="sampleH">Heading Sample</h2>
+            <p id="sampleP">The quick brown fox jumps over the lazy dog — 0123456789. Use this preview to check size, weight and readability for each font pairing.</p>
+            <div style="margin-top:10px">
+              <label>Sample text</label>
+              <textarea id="sampleText" style="height:80px;margin-top:6px">The quick brown fox jumps over the lazy dog.
+0123456789 — Sample preview text.</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 8px">Suggested Pairings</h2>
+      <p style="margin:0 0 8px;color:#374151">Automatic pairings (serif + sans-serif combos and popular W3Schools-inspired pairs). Click a chip to apply.</p>
+      <div id="suggestions" class="pair-list"></div>
+      <div class="meta">You can expand the list or add your own Google Font link. The tool will inject the custom link for preview and into the generated CSS.</div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 8px">CSS Snippet (copy / download)</h2>
+      <pre id="cssSnippet" style="background:#f8fafc;border-radius:8px;padding:12px;border:1px solid #e6e9ef;white-space:pre-wrap"></pre>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 8px">Description</h2>
+      <p style="margin:0;color:#374151;line-height:1.6">This Font Pairing Tool helps designers and content creators choose complementary fonts for headings and body text. It includes a curated set of web-safe and Google Fonts, pairing suggestions inspired by typography tips on W3Schools, and easy export of CSS. Use the custom Google Fonts link field to add production-ready font imports.</p>
+      <ul style="margin-top:8px;color:#374151">
+        <li>Preview live samples and adjust sample text.</li>
+        <li>Apply suggested pairings or create custom combinations.</li>
+        <li>Copy or download a ready-to-use CSS snippet that includes font imports.</li>
+        <li>Extendable: add more fonts to the <code>fonts</code> list in the script.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Basic font list: a mix of web-safe and popular Google Fonts (names and CSS font-family)
+    const fonts = [
+      {id:'Roboto', css:"'Roboto', sans-serif", url:'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap'},
+      {id:'Open Sans', css:"'Open Sans', sans-serif", url:'https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap'},
+      {id:'Lato', css:"'Lato', sans-serif", url:'https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap'},
+      {id:'Montserrat', css:"'Montserrat', sans-serif", url:'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap'},
+      {id:'Poppins', css:"'Poppins', sans-serif", url:'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap'},
+      {id:'Merriweather', css:"'Merriweather', serif", url:'https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&display=swap'},
+      {id:'Playfair Display', css:"'Playfair Display', serif", url:'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap'},
+      {id:'Georgia', css:"Georgia, 'Times New Roman', Times, serif", url:null},
+      {id:'Times New Roman', css:"'Times New Roman', Times, serif", url:null},
+      {id:'Arial', css:"Arial, Helvetica, sans-serif", url:null},
+      {id:'Tahoma', css:"Tahoma, Geneva, sans-serif", url:null},
+      {id:'Courier New', css:"'Courier New', monospace", url:null},
+      {id:'Source Sans Pro', css:"'Source Sans Pro', sans-serif", url:'https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&display=swap'},
+      {id:'Nunito', css:"'Nunito', sans-serif", url:'https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;700&display=swap'},
+      {id:'Raleway', css:"'Raleway', sans-serif", url:'https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;700&display=swap'}
+    ];
+
+    const suggestions = [
+      {head:'Playfair Display', body:'Lato'},
+      {head:'Merriweather', body:'Roboto'},
+      {head:'Montserrat', body:'Open Sans'},
+      {head:'Poppins', body:'Merriweather'},
+      {head:'Raleway', body:'Roboto'},
+      {head:'Georgia', body:'Source Sans Pro'}
+    ];
+
+    const headingEl = document.getElementById('headingFont');
+    const bodyEl = document.getElementById('bodyFont');
+    const preview = document.getElementById('preview');
+    const sampleH = document.getElementById('sampleH');
+    const sampleP = document.getElementById('sampleP');
+    const sampleText = document.getElementById('sampleText');
+    const suggestionsEl = document.getElementById('suggestions');
+    const cssSnippet = document.getElementById('cssSnippet');
+    const customLink = document.getElementById('customLink');
+
+    function populateSelect(){
+      [headingEl, bodyEl].forEach(sel=>{
+        sel.innerHTML = '';
+        fonts.forEach(f=>{ const o=document.createElement('option'); o.value=f.id; o.textContent=f.id; sel.appendChild(o); });
+      });
+      headingEl.value = 'Montserrat'; bodyEl.value = 'Roboto';
+    }
+
+    function populateSuggestions(){
+      suggestionsEl.innerHTML = '';
+      suggestions.forEach(s=>{
+        const btn = document.createElement('button'); btn.className='chip'; btn.textContent = s.head + ' • ' + s.body;
+        btn.addEventListener('click', ()=>{ headingEl.value=s.head; bodyEl.value=s.body; applyFonts(); });
+        suggestionsEl.appendChild(btn);
+      });
+    }
+
+    function getFontObjById(id){ return fonts.find(f=>f.id===id) || null; }
+
+    function applyFonts(){
+      const h = getFontObjById(headingEl.value);
+      const b = getFontObjById(bodyEl.value);
+      // inject custom link if provided
+      injectFontLinks([h,b]);
+      // apply styles
+      sampleH.style.fontFamily = h ? h.css : 'inherit'; sampleH.style.fontSize = '34px';
+      sampleP.style.fontFamily = b ? b.css : 'inherit'; sampleP.style.fontSize = '16px';
+      sampleH.textContent = sampleText.value.split('\n')[0] || 'Heading Sample';
+      sampleP.textContent = sampleText.value.split('\n').slice(1).join(' ') || sampleText.value || 'The quick brown fox jumps over the lazy dog.';
+      updateCssSnippet(h,b);
+    }
+
+    // Manage injected link tags to load Google Fonts
+    function injectFontLinks(list){
+      // remove previous injected links (data-fontpair)
+      document.querySelectorAll('link[data-fontpair]').forEach(l=>l.remove());
+      // custom link handling: if user pasted a full Google fonts href or @import url, try to use it
+      const custom = customLink.value.trim();
+      if(custom){
+        try{
+          if(custom.startsWith('http') || custom.startsWith('https')){
+            const l = document.createElement('link'); l.rel='stylesheet'; l.href = custom; l.setAttribute('data-fontpair','1'); document.head.appendChild(l);
+          } else if(custom.includes('@import')){
+            // create style tag with @import
+            const st = document.createElement('style'); st.setAttribute('data-fontpair','1'); st.textContent = custom; document.head.appendChild(st);
+          }
+        }catch(e){ console.warn('Invalid custom link'); }
+      }
+      // inject necessary google font URLs
+      list.forEach(f=>{ if(f && f.url){ const l=document.createElement('link'); l.rel='stylesheet'; l.href=f.url; l.setAttribute('data-fontpair','1'); document.head.appendChild(l); } });
+    }
+
+    function updateCssSnippet(h,b){
+      const imports = [];
+      if(customLink.value.trim()) imports.push('/* Custom import provided by user */\n' + customLink.value.trim());
+      [h,b].forEach(f=>{ if(f && f.url) imports.push(`@import url('${f.url}');`); });
+      const css = `${imports.join('\n')}\n\nbody { font-family: ${b ? b.css : 'system-ui, sans-serif'}; font-size:16px; color:#111827; line-height:1.6 }\nh1,h2,h3{ font-family: ${h ? h.css : 'inherit'}; margin:0 0 0.5em }\n
+/* Example usage */\nh1{ font-size:34px }\n.p-lg{ font-size:20px }\n`;
+      cssSnippet.textContent = css;
+    }
+
+    document.getElementById('apply').addEventListener('click', applyFonts);
+    document.getElementById('swap').addEventListener('click', ()=>{ const a=headingEl.value; headingEl.value=bodyEl.value; bodyEl.value=a; applyFonts(); });
+
+    document.getElementById('copyCss').addEventListener('click', async ()=>{
+      try{ await navigator.clipboard.writeText(cssSnippet.textContent); alert('CSS copied to clipboard'); }catch(e){ alert('Copy failed — allow clipboard access'); }
+    });
+
+    document.getElementById('downloadCss').addEventListener('click', ()=>{
+      const blob = new Blob([cssSnippet.textContent], {type:'text/css'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download='font-pair.css'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    // update preview text when sample changes
+    sampleText.addEventListener('input', applyFonts);
+
+    // init
+    populateSelect(); populateSuggestions(); applyFonts();
+
+  </script>
+</body>
+</html>

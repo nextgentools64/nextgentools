@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>XML Validator — Storedropship Tool</title>
+<meta name="description" content="Validate XML data online. Check for well-formedness, errors, and format your XML for better readability. Copy, download, or correct your XML data instantly." />
+<meta name="keywords" content="XML Validator, validate XML, online XML tool, format XML, XML check, XML editor" />
+<style>
+:root{--bg:#f9fafb;--card:#fff;--muted:#6b7280;--accent:#0ea5a4}
+*{box-sizing:border-box;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif}
+body{margin:0;padding:20px;background:linear-gradient(180deg,var(--bg),#eef2ff);color:#111827}
+.wrap{max-width:960px;margin:0 auto}
+.card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.05);margin-bottom:14px}
+h1{margin-bottom:6px;font-size:20px}
+p.lead{margin:0 0 12px;color:var(--muted)}
+textarea{width:100%;height:220px;padding:10px;border-radius:8px;border:1px solid #e6eef6;font-size:14px;margin-top:8px;resize:vertical}
+.controls{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+button.primary{background:var(--accent);color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer}
+button.alt{background:#fff;border:1px solid #e6eef6;color:#0b5394;padding:10px;border-radius:8px}
+pre{background:#f8fafc;padding:12px;border-radius:8px;border:1px solid #e6e9ef;overflow:auto;max-height:320px;white-space:pre-wrap;word-wrap:break-word}
+.meta{font-size:13px;color:var(--muted);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card">
+<h1>XML Validator</h1>
+<p class="lead">Validate and format your XML data online. Check for well-formedness, syntax errors, and pretty-print XML for readability. Copy or download validated XML easily.</p>
+<label for="xmlInput">XML Input</label>
+<textarea id="xmlInput" placeholder="Paste your XML here..."></textarea>
+<div class="controls">
+<button class="primary" id="validateBtn">Validate XML</button>
+<button class="alt" id="formatBtn">Format XML</button>
+<button class="alt" id="copyBtn">Copy Output</button>
+<button class="alt" id="downloadBtn">Download</button>
+<button class="alt" id="clearBtn">Clear</button>
+</div>
+<label>Output</label>
+<pre id="output">No output yet. Paste XML and click Validate.</pre>
+<div class="meta">Tip: Ensure your XML has a single root element and properly closed tags.</div>
+</div>
+<div class="card">
+<h2>Description</h2>
+<p style="margin:0;color:#374151;line-height:1.6">This XML Validator is a browser-based tool to quickly check XML for errors, validate structure, and format it neatly. Features include:</p>
+<ul style="margin-top:6px;color:#374151">
+<li>Check for well-formed XML syntax.</li>
+<li>Pretty-print XML with indentation for readability.</li>
+<li>Copy output to clipboard or download as .xml file.</li>
+<li>Offline-ready, fast, and lightweight.</li>
+</ul>
+</div>
+</div>
+<script>
+const xmlInput = document.getElementById('xmlInput');
+const output = document.getElementById('output');
+const validateBtn = document.getElementById('validateBtn');
+const formatBtn = document.getElementById('formatBtn');
+const copyBtn = document.getElementById('copyBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const clearBtn = document.getElementById('clearBtn');
+
+function validateXML(xmlString){
+  try{
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlString,'application/xml');
+    const parsererror = xmlDoc.getElementsByTagName('parsererror');
+    if(parsererror.length>0){
+      return {valid:false,error:parsererror[0].textContent};
+    }
+    return {valid:true,xml:xmlDoc};
+  }catch(e){
+    return {valid:false,error:e.message};
+  }
+}
+
+function formatXML(xmlString){
+  const validated = validateXML(xmlString);
+  if(!validated.valid) return validated.error;
+  const serializer = new XMLSerializer();
+  const xmlText = serializer.serializeToString(validated.xml);
+  const formatted = xmlText.replace(/(>)(<)(\/?)/g,'$1\n$2$3');
+  let pad = 0;
+  return formatted.split('\n').map(line=>{
+    let indent = '';
+    if(line.match(/<\//)) pad--;
+    for(let i=0;i<pad;i++) indent+='  ';
+    if(line.match(/<[^!?].*[^/]>$/)) pad++;
+    return indent+line;
+  }).join('\n');
+}
+
+validateBtn.addEventListener('click',()=>{
+  const result = validateXML(xmlInput.value);
+  output.textContent = result.valid?'XML is valid ✅':'XML Error ❌\n'+result.error;
+});
+
+formatBtn.addEventListener('click',()=>{
+  output.textContent = formatXML(xmlInput.value);
+});
+
+copyBtn.addEventListener('click',async()=>{
+  try{await navigator.clipboard.writeText(output.textContent);alert('Copied!');}catch(e){alert('Copy failed');}
+});
+
+downloadBtn.addEventListener('click',()=>{
+  const text = output.textContent;
+  if(!text) return alert('Nothing to download');
+  const blob = new Blob([text],{type:'application/xml'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='output.xml'; a.click(); URL.revokeObjectURL(url);
+});
+
+clearBtn.addEventListener('click',()=>{xmlInput.value='';output.textContent='';});
+</script>
+</body>
+</html>

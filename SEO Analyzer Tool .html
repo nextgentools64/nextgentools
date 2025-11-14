@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEO Analyzer Tool</title>
+  <style>
+    body {font-family: Arial, sans-serif; background:#f8f9fa; padding:20px; text-align:center;}
+    h1 {color:#2c3e50;}
+    input, textarea, button {
+      width:90%; max-width:600px; margin:10px auto; display:block;
+      padding:10px; border:1px solid #ccc; border-radius:8px;
+    }
+    button {background:#2c3e50; color:white; cursor:pointer; font-size:16px;}
+    button:hover {background:#34495e;}
+    .result {margin-top:20px; padding:15px; background:#fff; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1);}
+    .good {color:green; font-weight:bold;}
+    .bad {color:red; font-weight:bold;}
+  </style>
+</head>
+<body>
+  <h1>SEO Analyzer Tool</h1>
+  <textarea id="htmlInput" rows="10" placeholder="Paste your webpage HTML code here..."></textarea>
+  <input type="text" id="keyword" placeholder="Enter target keyword (optional)">
+  <button onclick="analyzeSEO()">Analyze SEO</button>
+
+  <div id="output" class="result"></div>
+
+<script>
+function analyzeSEO(){
+  let html = document.getElementById("htmlInput").value;
+  let keyword = document.getElementById("keyword").value.toLowerCase();
+  let output = "";
+
+  // Title Check
+  let titleMatch = html.match(/<title>(.*?)<\/title>/i);
+  if(titleMatch){
+    let title = titleMatch[1];
+    output += "<p><b>Title:</b> " + title + " ("+title.length+" chars)</p>";
+    output += (title.length >= 50 && title.length <= 60) ? "<p class='good'>✅ Good Title Length</p>" : "<p class='bad'>❌ Title should be 50-60 characters</p>";
+  } else {
+    output += "<p class='bad'>❌ No Title Found</p>";
+  }
+
+  // Meta Description
+  let descMatch = html.match(/<meta name=["']description["'] content=["'](.*?)["']/i);
+  if(descMatch){
+    let desc = descMatch[1];
+    output += "<p><b>Description:</b> " + desc + " ("+desc.length+" chars)</p>";
+    output += (desc.length >= 120 && desc.length <= 160) ? "<p class='good'>✅ Good Description Length</p>" : "<p class='bad'>❌ Description should be 120-160 characters</p>";
+  } else {
+    output += "<p class='bad'>❌ No Meta Description Found</p>";
+  }
+
+  // H1 Tag
+  let h1Match = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
+  if(h1Match){
+    output += "<p class='good'>✅ H1 Tag Found: " + h1Match[1] + "</p>";
+  } else {
+    output += "<p class='bad'>❌ No H1 Tag Found</p>";
+  }
+
+  // Keyword Check
+  if(keyword){
+    let count = (html.toLowerCase().match(new RegExp(keyword,"g")) || []).length;
+    output += (count>0) ? "<p class='good'>✅ Keyword '"+keyword+"' found "+count+" times</p>" : "<p class='bad'>❌ Keyword '"+keyword+"' not found</p>";
+  }
+
+  document.getElementById("output").innerHTML = output;
+}
+</script>
+</body>
+</html>

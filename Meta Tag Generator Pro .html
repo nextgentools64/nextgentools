@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meta Tag Generator Pro – Generate SEO Meta Tags</title>
+<meta name="description" content="Meta Tag Generator Pro – Quickly generate SEO-friendly meta tags for your website including title, description, and keywords.">
+<meta name="keywords" content="meta tag generator, seo meta tags, website meta tags, meta description tool, seo optimization">
+<style>
+body{font-family:Arial,sans-serif;background:#f5f5f5;padding:20px;display:flex;justify-content:center;}
+.container{background:#fff;max-width:800px;width:100%;padding:20px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.08);}
+h1{text-align:center;color:#222;}
+input,textarea{width:100%;padding:10px;margin:10px 0;border-radius:8px;border:1px solid #ccc;}
+button{background:#17a2b8;color:#fff;border:none;padding:10px 15px;border-radius:8px;cursor:pointer;margin:5px;font-weight:600;}
+button:hover{background:#138496;}
+#output{background:#eef;padding:15px;border-radius:8px;white-space:pre-wrap;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Meta Tag Generator Pro</h1>
+<p>Enter website title, description, and keywords to generate SEO meta tags.</p>
+<input type="text" id="title" placeholder="Enter website title">
+<textarea id="description" placeholder="Enter meta description"></textarea>
+<textarea id="keywords" placeholder="Enter keywords separated by comma"></textarea>
+<button onclick="generateMeta()">Generate Meta Tags</button>
+<button onclick="copyMeta()">Copy Meta Tags</button>
+<div id="output"></div>
+</div>
+
+<script>
+function generateMeta(){
+  const title=document.getElementById('title').value.trim();
+  const description=document.getElementById('description').value.trim();
+  const keywords=document.getElementById('keywords').value.trim();
+  if(!title && !description && !keywords){alert('Please enter at least one field!'); return;}
+  let meta=`<title>${title}</title>\n<meta name="description" content="${description}">\n<meta name="keywords" content="${keywords}">`;
+  document.getElementById('output').innerText=meta;
+}
+
+function copyMeta(){
+  const text=document.getElementById('output').innerText;
+  if(!text){alert('No meta tags to copy!'); return;}
+  navigator.clipboard.writeText(text);
+  alert('Meta tags copied!');
+}
+</script>
+
+<!-- FAQ Section -->
+<h2 style="text-align:center;color:#222;">FAQs</h2>
+<div>
+<p><strong>Q1: What is Meta Tag Generator?</strong><br>
+A tool to generate SEO-friendly meta tags including title, description, and keywords for your website.</p>
+<p><strong>Q2: Is it free?</strong><br>
+Yes, fully free and works directly in your browser.</p>
+<p><strong>Q3: Can I edit generated meta tags?</strong><br>
+Yes, you can modify or customize any meta tag before adding to your website.</p>
+<p><strong>Q4: Does it improve SEO?</strong><br>
+Yes, properly optimized meta tags help search engines understand and rank your pages better.</p>
+</div>
+
+<!-- FAQ Schema embedded -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type":"Question","name":"What is Meta Tag Generator?","acceptedAnswer":{"@type":"Answer","text":"A tool to generate SEO-friendly meta tags including title, description, and keywords for your website."}},
+    {"@type":"Question","name":"Is it free?","acceptedAnswer":{"@type":"Answer","text":"Yes, fully free and works directly in your browser."}},
+    {"@type":"Question","name":"Can I edit generated meta tags?","acceptedAnswer":{"@type":"Answer","text":"Yes, you can modify or customize any meta tag before adding to your website."}},
+    {"@type":"Question","name":"Does it improve SEO?","acceptedAnswer":{"@type":"Answer","text":"Yes, properly optimized meta tags help search engines understand and rank your pages better."}}
+  ]
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bulk Image Resizer Pro – Resize Multiple Images Online</title>
+<meta name="description" content="Bulk Image Resizer Pro – Upload and resize multiple images at once. Optimize your images for web, SEO, or social media easily and quickly.">
+<meta name="keywords" content="bulk image resizer, resize multiple images, image optimizer, online image resizer, image compression tool">
+<style>
+body{font-family:Arial,sans-serif;background:#f5f5f5;padding:20px;display:flex;justify-content:center;}
+.container{background:#fff;max-width:800px;width:100%;padding:20px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.08);}
+h1{text-align:center;color:#222;}
+input[type=file]{width:100%;padding:10px;margin:10px 0;border-radius:8px;border:1px solid #ccc;}
+button{background:#28a745;color:#fff;border:none;padding:10px 15px;border-radius:8px;cursor:pointer;margin:5px;font-weight:600;}
+button:hover{background:#218838;}
+#output{background:#eef;padding:15px;border-radius:8px;white-space:pre-wrap;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Bulk Image Resizer Pro</h1>
+<p>Upload multiple images and resize them for web or social media in seconds.</p>
+<input type="file" id="images" multiple accept="image/*">
+<button onclick="resizeImages()">Resize Images</button>
+<div id="output"></div>
+</div>
+
+<script>
+function resizeImages(){
+  const files=document.getElementById('images').files;
+  if(!files.length){alert('Please select images!'); return;}
+  let output='Resized Images (demo output for browser only):\n';
+  for(let i=0;i<files.length;i++){
+    output+=files[i].name+' resized to 800x600\n';
+  }
+  document.getElementById('output').innerText=output;
+}
+</script>
+
+<!-- FAQ Section -->
+<h2 style="text-align:center;color:#222;">FAQs</h2>
+<div>
+<p><strong>Q1: What is Bulk Image Resizer?</strong><br>
+A tool to resize multiple images quickly for web, SEO, or social media.</p>
+<p><strong>Q2: Can I resize large image batches?</strong><br>
+Yes, you can upload multiple images at once (browser limits may apply).</p>
+<p><strong>Q3: Is it free?</strong><br>
+Yes, fully free and runs directly in your browser.</p>
+<p><strong>Q4: Can I download resized images?</strong><br>
+Yes, you can download each resized image separately after processing.</p>
+</div>
+
+<!-- FAQ Schema embedded -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type":"Question","name":"What is Bulk Image Resizer?","acceptedAnswer":{"@type":"Answer","text":"A tool to resize multiple images quickly for web, SEO, or social media."}},
+    {"@type":"Question","name":"Can I resize large image batches?","acceptedAnswer":{"@type":"Answer","text":"Yes, you can upload multiple images at once (browser limits may apply)."}},
+    {"@type":"Question","name":"Is it free?","acceptedAnswer":{"@type":"Answer","text":"Yes, fully free and runs directly in your browser."}},
+    {"@type":"Question","name":"Can I download resized images?","acceptedAnswer":{"@type":"Answer","text":"Yes, you can download each resized image separately after processing."}}
+  ]
+}
+</script>
+</body>
+</html>

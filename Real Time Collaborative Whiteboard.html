@@ -1,0 +1,479 @@
+<!--
+Filename Suggestion: whiteboard-app.html
+Description: A responsive, real-time collaborative drawing application using HTML Canvas, client-side JavaScript, and Google Firestore for instant synchronization across multiple users. Includes documentation.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collaborative Whiteboard</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="A real-time collaborative whiteboard where multiple users can draw and see updates instantly using Google Firestore.">
+    <meta name="keywords" content="whiteboard, collaboration, real-time, canvas, firestore, drawing app">
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configure Tailwind for Inter font and clean styles -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        canvas {
+            background-color: #fff;
+            border: 1px solid #e2e8f0;
+            cursor: crosshair;
+            touch-action: none; /* Disable default touch actions for drawing */
+        }
+        /* Custom ring for selected color */
+        .color-selector.selected {
+            box-shadow: 0 0 0 4px #fff, 0 0 0 6px rgba(99, 102, 241, 1); /* Custom indigo ring */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center pt-8 pb-8">
+
+    <div class="w-full max-w-4xl mx-4">
+        <header class="text-center mb-6">
+            <h1 class="text-3xl font-extrabold text-gray-800 mb-2">Real-Time Collaborative Whiteboard</h1>
+            <p id="userIdDisplay" class="text-xs text-indigo-600 font-medium tracking-wide border border-indigo-300 p-1 rounded-full inline-block bg-indigo-50">
+                Your ID: Connecting...
+            </p>
+        </header>
+
+        <!-- Whiteboard Application Card -->
+        <div class="bg-white rounded-xl shadow-2xl p-6 border border-indigo-200 mb-8">
+            
+            <!-- Controls -->
+            <div class="flex flex-wrap justify-between items-center mb-4 p-3 bg-gray-50 rounded-lg border">
+                
+                <!-- Color Palette -->
+                <div class="flex items-center space-x-2 mb-2 sm:mb-0">
+                    <span class="text-sm font-semibold text-gray-700">Pen Color:</span>
+                    <div id="colorPalette" class="flex space-x-2">
+                        <!-- Colors inserted by JS -->
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex space-x-3">
+                    <button 
+                        id="clearButton" 
+                        class="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition duration-150 font-medium text-sm shadow-md disabled:opacity-50"
+                        disabled
+                    >
+                        Clear Board (For Everyone)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Canvas Area -->
+            <div id="canvasContainer" class="flex justify-center items-center">
+                <canvas id="whiteboardCanvas" class="rounded-lg shadow-inner"></canvas>
+            </div>
+            
+            <div id="loadingIndicator" class="text-center py-8 text-gray-500">
+                <p>Initializing canvas and connecting to real-time service...</p>
+            </div>
+            
+        </div>
+
+        <!-- Documentation Section -->
+        <div class="mt-8 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">How to Use the Collaborative Whiteboard</h2>
+            <p class="text-gray-600 mb-4">This whiteboard allows multiple people to draw together in **real time**. All strokes are instantly synchronized across all connected users.</p>
+            
+            <h3 class="text-xl font-semibold text-gray-700 mb-3">Drawing and Tools</h3>
+            <ul class="list-disc list-inside space-y-2 text-gray-600 ml-4">
+                <li>**To Draw:** Click and drag your mouse on the canvas, or use your finger/stylus on a touchscreen device.</li>
+                <li>**Change Color:** Select one of the color circles in the **Pen Color** palette before you start drawing a new stroke.</li>
+                <li>**Real-Time Sync:** As you draw, your stroke data is sent to the server, and every other user's canvas is updated instantly.</li>
+                <li>**Clear Board:** Use the **"Clear Board"** button to erase the canvas for *all* currently connected users.</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-gray-800 mt-8 mb-4 border-t pt-4">Frequently Asked Questions (FAQs)</h2>
+            <div class="space-y-4">
+                <div>
+                    <h4 class="font-medium text-gray-800">1. How does the real-time collaboration work?</h4>
+                    <p class="text-sm text-gray-600">This application uses **Google Firestore** with real-time listeners (`onSnapshot`). Instead of saving the entire image, we save the individual **drawing strokes** (points, color, and size). When you complete a stroke, it is saved, and Firestore immediately sends that new stroke data to every other user's app, which then renders it instantly on their canvas.</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-800">2. Is the drawing saved permanently?</h4>
+                    <p class="text-sm text-gray-600">No. This is designed for temporary collaborative sessions. When you or another user clicks **"Clear Board,"** the entire stored drawing data is deleted from the public collection in Firestore.</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-800">3. Why is my User ID displayed?</h4>
+                    <p class="text-sm text-gray-600">Your unique User ID helps the application track which user initiates a drawing stroke or clears the board. In a more complex app, this ID could be used to implement permissions or identify contributors.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-gray-500 text-sm">
+            <p>Site Name: StoreDropship.in | Contact: +91 9258036351, contact@storedropship.in</p>
+        </footer>
+    </div>
+
+    <!-- Firebase Configuration and Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, doc, onSnapshot, setDoc, getDoc,
+            collection, query, 
+            setLogLevel 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        setLogLevel('debug');
+
+        // --- GLOBAL ENVIRONMENT VARIABLES ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- FIREBASE INSTANCES & STATE ---
+        let db, auth;
+        let userId = null;
+        const CANVAS_DOC_ID = "current_drawing"; // Single document to hold all strokes
+
+        // --- CANVAS STATE ---
+        const canvas = document.getElementById('whiteboardCanvas');
+        // Ensure canvas element exists before trying to get context
+        const ctx = canvas ? canvas.getContext('2d') : null;
+        if (!ctx) {
+            console.error("Canvas context could not be initialized.");
+            if (document.getElementById('loadingIndicator')) {
+                document.getElementById('loadingIndicator').innerHTML = '<p class="text-red-500">Error: Canvas not found or not supported.</p>';
+            }
+        }
+
+        let isDrawing = false;
+        let currentStroke = [];
+        let penColor = '#000000';
+        const PEN_SIZE = 5;
+
+        // --- DOM ELEMENTS ---
+        const userIdDisplay = document.getElementById('userIdDisplay');
+        const clearButton = document.getElementById('clearButton');
+        const colorPalette = document.getElementById('colorPalette');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+
+        // --- COLORS ---
+        const colors = ['#000000', '#FF0000', '#00AA00', '#0000FF', '#FFA500', '#800080'];
+        
+        // --- FIREBASE INITIALIZATION AND AUTH ---
+
+        async function initializeFirebase() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Authenticate user
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                userId = auth.currentUser?.uid || crypto.randomUUID();
+                
+                userIdDisplay.textContent = `Your ID: ${userId}`;
+                clearButton.disabled = false;
+
+                // CRITICAL STEP: Ensure the document exists before setting up the listener
+                await ensureDocumentExists();
+
+                if (ctx) { // Proceed only if canvas context is ready
+                    setupCanvas();
+                    setupPalette();
+                    setupRealtimeListener();
+                }
+
+            } catch (error) {
+                console.error("Firebase Initialization Failed:", error);
+                userIdDisplay.textContent = "Error connecting to service.";
+                if (loadingIndicator) {
+                     loadingIndicator.innerHTML = '<p class="text-red-500">Error connecting to collaboration service. Check console for details.</p>';
+                }
+            }
+        }
+        
+        /**
+         * Returns the reference to the public drawing document.
+         */
+        function getCanvasDocRef() {
+            if (!db) return null;
+            // Public data path: /artifacts/{appId}/public/data/whiteboard/current_drawing
+            return doc(db, 'artifacts', appId, 'public', 'data', 'whiteboard', CANVAS_DOC_ID);
+        }
+
+        /**
+         * Ensures the public drawing document exists with an empty strokes array.
+         * This prevents 'Missing or insufficient permissions' errors on initial read.
+         */
+        async function ensureDocumentExists() {
+            const docRef = getCanvasDocRef();
+            if (!docRef) return;
+
+            try {
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) {
+                    // Initialize the document with an empty array if it doesn't exist
+                    // This is a single, guaranteed write action that satisfies the security rules.
+                    await setDoc(docRef, { strokes: [] }, { merge: false });
+                    console.log("Whiteboard document initialized in Firestore.");
+                }
+            } catch (error) {
+                // If this fails, the listener will likely fail too, but we logged the error.
+                console.error("Error ensuring document existence:", error);
+            }
+        }
+        
+        // --- CANVAS SETUP ---
+
+        function setupCanvas() {
+            // Set canvas size based on container for responsiveness
+            function resizeCanvas() {
+                const container = document.getElementById('canvasContainer');
+                const size = Math.min(container.clientWidth, 600); // Max size 600px
+                canvas.width = size;
+                canvas.height = size;
+                redrawCanvasFromData();
+            }
+
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            // Set drawing style defaults
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            ctx.lineWidth = PEN_SIZE;
+            ctx.strokeStyle = penColor;
+
+            // Mouse and Touch event listeners for drawing
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mousemove', draw);
+            
+            canvas.addEventListener('touchstart', (e) => {
+                const touch = e.touches[0];
+                startDrawing(touch);
+            });
+            canvas.addEventListener('touchend', stopDrawing);
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault(); // Prevent scrolling
+                const touch = e.touches[0];
+                draw(touch);
+            });
+        }
+
+        function setupPalette() {
+            colors.forEach(color => {
+                const colorDiv = document.createElement('div');
+                colorDiv.className = `color-selector w-8 h-8 rounded-full cursor-pointer transition-all hover:scale-110`;
+                colorDiv.style.backgroundColor = color;
+                colorDiv.setAttribute('data-color', color);
+                colorDiv.addEventListener('click', () => selectColor(color));
+                colorPalette.appendChild(colorDiv);
+            });
+
+            // Select initial color
+            selectColor(colors[0]);
+        }
+
+        function selectColor(color) {
+            penColor = color;
+            if (ctx) {
+                ctx.strokeStyle = penColor;
+            }
+            
+            // Update UI selection
+            document.querySelectorAll('.color-selector').forEach(div => {
+                div.classList.remove('selected');
+            });
+            const selectedDiv = document.querySelector(`.color-selector[data-color="${color}"]`);
+            if (selectedDiv) {
+                selectedDiv.classList.add('selected');
+            }
+        }
+
+        // --- DRAWING LOGIC ---
+
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            return { x, y };
+        }
+
+        function startDrawing(e) {
+            if (!userId || !ctx) return; 
+            isDrawing = true;
+            const pos = getMousePos(e);
+            currentStroke = [{ x: pos.x, y: pos.y, color: penColor, size: PEN_SIZE }];
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            ctx.strokeStyle = penColor;
+            ctx.lineWidth = PEN_SIZE;
+        }
+
+        function draw(e) {
+            if (!isDrawing || !ctx) return;
+            const pos = getMousePos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            currentStroke.push({ x: pos.x, y: pos.y, color: penColor, size: PEN_SIZE });
+        }
+
+        async function stopDrawing() {
+            if (!isDrawing) return;
+            isDrawing = false;
+            if (ctx) {
+                ctx.closePath();
+            }
+            
+            // Only save stroke if there are multiple points (not just a click)
+            if (currentStroke.length > 1) {
+                await saveStroke(currentStroke);
+            }
+            currentStroke = [];
+        }
+
+        // --- FIRESTORE LOGIC ---
+
+        // Local copy of all strokes to manage drawing history
+        let allStrokes = [];
+
+        /**
+         * Saves the current stroke data to Firestore by merging it into the document.
+         */
+        async function saveStroke(strokeData) {
+            const docRef = getCanvasDocRef();
+            if (!docRef) return;
+
+            // Use JSON.stringify to ensure the array of objects is stored cleanly
+            const newStroke = {
+                data: JSON.stringify(strokeData),
+                color: strokeData[0].color,
+                size: strokeData[0].size,
+                timestamp: Date.now()
+            };
+            
+            try {
+                // To save, we read the local history and append the new stroke before writing back.
+                const currentStrokes = allStrokes || [];
+                
+                await setDoc(docRef, { 
+                    strokes: [...currentStrokes, newStroke]
+                }, { merge: false });
+                
+            } catch (error) {
+                console.error("Error saving stroke to Firestore:", error);
+            }
+        }
+        
+        /**
+         * Real-time listener: fetches all drawing data when the document changes.
+         */
+        function setupRealtimeListener() {
+            const docRef = getCanvasDocRef();
+            if (!docRef) {
+                console.error("Cannot set up listener: Document reference is null.");
+                return;
+            }
+            
+            onSnapshot(docRef, (docSnap) => {
+                if (loadingIndicator) loadingIndicator.remove();
+                
+                if (docSnap.exists() && docSnap.data().strokes) {
+                    // Update local state and trigger redraw
+                    allStrokes = docSnap.data().strokes;
+                    redrawCanvasFromData();
+                } else {
+                    // If document exists but strokes array is empty (e.g., after a clear)
+                    allStrokes = [];
+                    redrawCanvasFromData();
+                }
+
+            }, (error) => {
+                console.error("Firestore real-time listener failed:", error);
+                if (loadingIndicator) {
+                    loadingIndicator.innerHTML = '<p class="text-red-500">Error loading real-time drawing data. Check console for details.</p>';
+                }
+            });
+        }
+        
+        /**
+         * Redraws the entire canvas using the data from allStrokes.
+         */
+        function redrawCanvasFromData() {
+            if (!ctx) return;
+            
+            // 1. Clear the entire canvas locally
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (allStrokes.length === 0) return;
+
+            // 2. Iterate through all stored strokes and redraw them
+            allStrokes.forEach(stroke => {
+                try {
+                    // JSON.parse to retrieve the original array of points
+                    const points = JSON.parse(stroke.data);
+                    
+                    if (points.length < 2) return; // Need at least two points to draw a line
+
+                    ctx.beginPath();
+                    ctx.strokeStyle = stroke.color;
+                    ctx.lineWidth = stroke.size;
+                    ctx.moveTo(points[0].x, points[0].y);
+
+                    for (let i = 1; i < points.length; i++) {
+                        ctx.lineTo(points[i].x, points[i].y);
+                        ctx.stroke();
+                        ctx.moveTo(points[i].x, points[i].y);
+                    }
+                    ctx.closePath();
+
+                } catch (e) {
+                    console.error("Error parsing stroke data:", e);
+                }
+            });
+            
+            // Restore current pen style
+            ctx.strokeStyle = penColor;
+            ctx.lineWidth = PEN_SIZE;
+        }
+
+        /**
+         * Clears the entire drawing history in Firestore.
+         */
+        clearButton.addEventListener('click', async () => {
+            const docRef = getCanvasDocRef();
+            if (!docRef) return;
+            
+            clearButton.disabled = true;
+            clearButton.textContent = "Clearing...";
+
+            try {
+                // Clearing the board means setting the strokes array to empty
+                await setDoc(docRef, { strokes: [] }, { merge: false });
+                
+                // The onSnapshot listener handles the local redraw (clearing the canvas)
+            } catch (error) {
+                console.error("Error clearing board:", error);
+            } finally {
+                clearButton.textContent = "Clear Board (For Everyone)";
+                clearButton.disabled = false;
+            }
+        });
+
+        // Initialize Firebase on load
+        window.onload = initializeFirebase;
+    </script>
+</body>
+</html>

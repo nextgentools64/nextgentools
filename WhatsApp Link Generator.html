@@ -1,0 +1,55 @@
+<div class="container" style="max-width: 500px; margin: 30px auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.1); font-family: Arial, sans-serif;">
+  <h2 style="text-align:center; color:#00aaff;">WhatsApp Link Generator</h2>
+
+  <input type="text" id="waNumber" placeholder="Enter WhatsApp Number (e.g. 919XXXXXXXXX)" style="width:100%; padding:12px; margin:10px 0; border:1px solid #ccc; border-radius:8px; font-size:16px;" />
+  
+  <input type="text" id="waMessage" placeholder="Enter your message" style="width:100%; padding:12px; margin:10px 0; border:1px solid #ccc; border-radius:8px; font-size:16px;" />
+  
+  <button id="generateBtn" style="width:100%; padding:14px; background:#00aaff; color:#fff; border:none; border-radius:8px; font-size:18px; cursor:pointer; margin-top:10px;">
+    Generate Link
+  </button>
+  
+  <button id="openBtn" style="width:100%; padding:14px; background:#00509e; color:#fff; border:none; border-radius:8px; font-size:18px; cursor:pointer; margin-top:10px; display:none;">
+    Open WhatsApp Chat
+  </button>
+  
+  <div id="waResult" style="margin-top:15px; font-weight:bold; word-break: break-word;"></div>
+</div>
+
+<script>
+  const generateBtn = document.getElementById('generateBtn');
+  const openBtn = document.getElementById('openBtn');
+  const waNumber = document.getElementById('waNumber');
+  const waMessage = document.getElementById('waMessage');
+  const waResult = document.getElementById('waResult');
+
+  let generatedLink = '';
+
+  generateBtn.addEventListener('click', () => {
+    let number = waNumber.value.trim();
+    let message = waMessage.value.trim();
+
+    if (!number) {
+      alert('Please enter WhatsApp number!');
+      return;
+    }
+
+    // Remove non-digit characters (like +, spaces)
+    number = number.replace(/\D/g, '');
+
+    // Encode message for URL
+    const encodedMessage = encodeURIComponent(message);
+
+    // Generate WhatsApp link
+    generatedLink = `https://wa.me/${number}?text=${encodedMessage}`;
+
+    waResult.textContent = generatedLink;
+    openBtn.style.display = 'block';
+  });
+
+  openBtn.addEventListener('click', () => {
+    if (generatedLink) {
+      window.open(generatedLink, '_blank');
+    }
+  });
+</script>

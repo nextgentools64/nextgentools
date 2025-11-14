@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <!-- Primary SEO -->
+  <title>PDF to EPUB — Convert PDFs into reflowable EPUB eBooks</title>
+  <meta name="description" content="Convert PDF files into EPUB eBooks. Generates reflowable EPUB, preserves images, creates TOC, and adds metadata and cover for reading on Kindle, Kobo, and mobile readers.">
+  <meta name="keywords" content="PDF to EPUB, convert PDF to epub, ebook converter, pdf epub converter, pdf to eBook">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="PDF to EPUB — Convert PDFs into reflowable EPUB eBooks">
+  <meta property="og:description" content="Convert PDF files into EPUB eBooks. Generates reflowable EPUB, preserves images, creates TOC, and adds metadata and cover for reading on Kindle and Kobo.">
+  <meta property="og:image" content="/assets/og-pdf-to-epub.png">
+  <meta property="og:url" content="https://storedropship.in/tools/pdf-to-epub/">
+
+  <style>
+    :root{--accent:#0b79d0;--muted:#666}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;margin:0;color:#111}
+    .container{max-width:980px;margin:0 auto;padding:28px}
+    header{display:flex;justify-content:space-between;align-items:center;padding:16px 0}
+    header a.logo{font-weight:700;color:var(--accent);text-decoration:none;font-size:20px}
+    nav a{margin-left:14px;text-decoration:none;color:var(--muted)}
+    .hero{display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start;margin-top:10px}
+    .card{background:#fff;border:1px solid #eee;padding:18px;border-radius:10px;box-shadow:0 6px 18px rgba(15,15,15,0.03)}
+    h1{margin:0 0 8px;font-size:28px}
+    p.lead{margin:0;color:var(--muted)}
+    ul.features{list-style:disc;margin:14px 0 0;padding-left:20px;color:var(--muted)}
+    .upload-box{display:flex;flex-direction:column;gap:10px}
+    input[type=file]{padding:8px}
+    button.primary{background:var(--accent);color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer}
+    .small{font-size:13px;color:var(--muted)}
+    .example-output{white-space:pre-wrap;background:#f7f9fc;padding:12px;border-radius:8px;border:1px dashed #e2e8f0}
+    footer{margin-top:30px;padding:18px 0;border-top:1px solid #eee;color:var(--muted)}
+    .meta-row{display:flex;gap:12px;flex-wrap:wrap;font-size:13px}
+    @media(max-width:880px){.hero{grid-template-columns:1fr;}.container{padding:18px}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a class="logo" href="/">storedropship.in</a>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/tools/">Tools</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <div class="card">
+            <h1>PDF to EPUB</h1>
+            <p class="lead">Convert any PDF into a reflowable EPUB eBook. Ideal for reading on smartphones, tablets, and eReaders — with optional cover, metadata, and a generated table of contents.</p>
+
+            <h3 style="margin-top:16px">How it works</h3>
+            <ol class="small">
+              <li>Extracts text and images from the PDF.</li>
+              <li>Attempts to detect headings to build a Table of Contents (TOC).</li>
+              <li>Reflows content into XHTML chapters and packages into an EPUB file.</li>
+            </ol>
+
+            <h3 style="margin-top:12px">Key Features</h3>
+            <ul class="features">
+              <li>Produces standard EPUB 2/3 files compatible with most readers</li>
+              <li>Auto-generates TOC from detected headings</li>
+              <li>Option to upload a cover image and edit metadata (title, author, language)</li>
+              <li>OCR support for scanned PDFs (optional)</li>
+            </ul>
+
+            <h3 style="margin-top:14px">Use-cases</h3>
+            <p class="small">Convert course materials, research papers, guides, or self-published PDFs into EPUB for better on-device reading and distribution.</p>
+          </div>
+
+          <div style="margin-top:14px" class="card">
+            <h3>Example output</h3>
+            <div class="example-output">Title: Example eBook\nAuthor: John Doe\n\n[Chapter 1]\nThis is the start of chapter 1...\n\n[Chapter 2]\nContinuation...</div>
+          </div>
+        </div>
+
+        <aside>
+          <div class="card upload-box">
+            <h3>Upload PDF</h3>
+            <!-- Placeholder form. Implement backend route /api/convert-epub to accept multipart/form-data and return the .epub file. -->
+            <form id="convertEpubForm" method="POST" enctype="multipart/form-data" action="/api/convert-epub">
+              <input type="file" id="pdfFileEpub" name="pdf" accept="application/pdf" required>
+              <label class="small">Title: <input type="text" name="title" placeholder="(auto-detected if blank)"></label>
+              <label class="small">Author: <input type="text" name="author" placeholder="(optional)"></label>
+              <label class="small"><input type="checkbox" name="generateToc" checked> Attempt to auto-generate Table of Contents</label>
+              <label class="small"><input type="checkbox" name="useOcr"> Use OCR for scanned pages (may increase time)</label>
+              <label class="small">Cover: <input type="file" name="cover" accept="image/*"></label>
+              <div style="display:flex;gap:8px;margin-top:6px">
+                <button type="submit" class="primary">Convert to EPUB</button>
+                <button type="button" id="downloadSampleEpub">Download Sample .epub</button>
+              </div>
+              <p class="small">Accepted: PDF files up to 50MB (server-dependent). For best results, provide a text-based PDF rather than scanned images.</p>
+            </form>
+
+            <hr>
+            <div class="small">
+              <strong>Contact</strong>
+              <div class="meta-row">
+                <span>WhatsApp: +91 9258036351</span>
+                <span>Email: <a href="mailto:contact@storedropship.in">contact@storedropship.in</a></span>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px" class="card">
+            <h4>Notes for implementation</h4>
+            <ul class="small">
+              <li>Server-side: Tools like <code>ebooklib</code> (Python), <code>pandoc</code>, or Calibre's <code>ebook-convert</code> are effective for building EPUBs.</li>
+              <li>To preserve tables and complex layouts, convert each page to HTML and post-process into chapters.</li>
+              <li>Use Tesseract OCR for scanned PDFs. Consider exposing an "OCR confidence" report to the user.</li>
+              <li>Generate EPUB metadata (title, author, language, identifiers) and let users override values in the form.</li>
+              <li>Optionally produce a MOBI/AZW3 output using Calibre for Kindle compatibility.</li>
+            </ul>
+          </div>
+        </aside>
+      </section>
+
+      <section style="margin-top:20px" class="card">
+        <h3>SEO & Sharing</h3>
+        <p class="small">Add sample screenshots, user testimonials, and an FAQ about EPUB compatibility to improve discoverability. Provide sample files and size guidelines.</p>
+      </section>
+
+      <section style="margin-top:18px" class="card">
+        <h3>Contact & Feedback</h3>
+        <p class="small">Need bulk conversion, API access, or WordPress plugin integration? Use the contact form below to request a custom solution.</p>
+        <form id="contactFormEpub" method="POST" action="/contact/submit">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input name="name" placeholder="Your name" required style="flex:1;padding:10px;border:1px solid #e6eef8;border-radius:8px">
+            <input name="email" placeholder="Email" type="email" required style="flex:1;padding:10px;border:1px solid #e6eef8;border-radius:8px">
+          </div>
+          <textarea name="message" placeholder="How can we help?" rows="4" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;border:1px solid #e6eef8"></textarea>
+          <div style="display:flex;justify-content:flex-end;margin-top:8px">
+            <button class="primary" type="submit">Send message</button>
+          </div>
+        </form>
+      </section>
+
+    </main>
+
+    <footer>
+      <div class="meta-row">
+        <div>© "Saumic Craft" / storedropship.in</div>
+        <div>Contact: <a href="https://wa.me/919258036351">+91 9258036351</a> | <a href="mailto:contact@storedropship.in">contact@storedropship.in</a></div>
+      </div>
+      <div style="margin-top:8px" class="small">Privacy · Terms · Sitemap</div>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById('downloadSampleEpub').addEventListener('click', function(){
+      // Small sample - create a minimal EPUB file client-side is complex; offer a simple text download placeholder
+      const blob = new Blob(['Sample EPUB placeholder - upload a PDF to get real EPUB.'], {type: 'application/epub+zip'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'sample.epub'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    // convertEpubForm: leave default POST to /api/convert-epub so server can return a file response.
+    document.getElementById('convertEpubForm').addEventListener('submit', function(e){
+      // default behaviour — server must handle conversion and return an epub file
+    });
+  </script>
+</body>
+</html>

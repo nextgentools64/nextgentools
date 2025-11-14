@@ -1,0 +1,298 @@
+<!--
+Filename Suggestion: chat-app.html
+Description: A responsive, real-time group chat application using HTML, Tailwind CSS, and Google Firestore for persistent, multi-user messaging. Includes clear 'How to Use' and FAQ sections.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Group Chat</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="A real-time group chat application demonstrating multi-user data synchronization using Google Firestore.">
+    <meta name="keywords" content="chat app, real-time, firestore, collaboration, html, javascript">
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configure Tailwind for Inter font and clean styles -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        /* Ensure the message container scrolls easily */
+        #messagesContainer {
+            max-height: 70vh; /* Limits height to ensure responsiveness */
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column-reverse; /* Display new messages at the bottom */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center pt-8 pb-8">
+
+    <div class="w-full max-w-lg mx-4">
+        <header class="text-center mb-6">
+            <h1 class="text-3xl font-extrabold text-gray-800 mb-2">Real-Time Group Chat</h1>
+            <p id="userIdDisplay" class="text-xs text-indigo-600 font-medium tracking-wide border border-indigo-300 p-1 rounded-full inline-block bg-indigo-50">
+                Your ID: Connecting...
+            </p>
+        </header>
+
+        <!-- Message Display Area -->
+        <div class="bg-white rounded-xl shadow-2xl p-4 border border-indigo-200 mb-4">
+            <div id="messagesContainer" class="space-y-4 pb-2">
+                <div id="loadingIndicator" class="text-center py-8 text-gray-500">
+                    <p>Connecting to chat server...</p>
+                </div>
+                <!-- Messages will be inserted here (LIFO order) -->
+            </div>
+        </div>
+
+        <!-- Message Input Form -->
+        <form id="messageForm" class="flex p-3 bg-white rounded-xl shadow-lg border border-gray-200">
+            <input 
+                type="text" 
+                id="messageInput" 
+                placeholder="Type your message..." 
+                class="flex-grow p-3 text-gray-700 border-none rounded-l-xl focus:ring-0 focus:outline-none"
+                required
+                autocomplete="off"
+                disabled
+            >
+            <button 
+                type="submit" 
+                id="sendButton"
+                class="bg-indigo-600 text-white p-3 rounded-xl hover:bg-indigo-700 transition duration-150 font-semibold flex items-center justify-center space-x-2 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Send Message"
+                disabled
+            >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+        </form>
+
+        <!-- Documentation Section -->
+        <div class="mt-8 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">How to Use the Chat App</h2>
+            <p class="text-gray-600 mb-4">This chat is a **real-time public room**. Any message you send is instantly visible to anyone else currently using this application.</p>
+            
+            <h3 class="text-xl font-semibold text-gray-700 mb-3">Your Identity</h3>
+            <ul class="list-disc list-inside space-y-2 text-gray-600 ml-4">
+                <li>You are identified by the **unique User ID** displayed at the top. This ID is assigned automatically when you load the app.</li>
+                <li>When you send a message, your ID is shown above your message bubble. Other users see this ID, but your messages appear labeled as **"You"** on your own screen.</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-gray-700 mt-6 mb-3 border-t pt-4">Sending Messages</h3>
+            <ul class="list-disc list-inside space-y-2 text-gray-600 ml-4">
+                <li>Type your message into the input field at the bottom.</li>
+                <li>Press **Enter** or click the **Send** button (the arrow icon).</li>
+                <li>Your message will appear immediately, and because the chat uses Firestore, it is **persistently saved** and accessible to anyone else in the public room.</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-gray-800 mt-8 mb-4 border-t pt-4">Frequently Asked Questions (FAQs)</h2>
+            <div class="space-y-4">
+                <div>
+                    <h4 class="font-medium text-gray-800">1. How is this chat real-time?</h4>
+                    <p class="text-sm text-gray-600">The application uses **Google Firestore** and its real-time listening feature (`onSnapshot`). When one user sends a message, Firestore instantly notifies all other connected users, updating their screens in milliseconds without needing to manually refresh.</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-800">2. Is my message history saved?</h4>
+                    <p class="text-sm text-gray-600">Yes. All messages are stored permanently in a **public collection** in the Firestore database. You will see the entire history every time you open the app.</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-800">3. Can I change my User ID?</h4>
+                    <p class="text-sm text-gray-600">The User ID is automatically assigned for security and tracking within the environment and cannot be changed inside the app. It serves as your unique, anonymous identifier in the chat room.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-gray-500 text-sm">
+            <p>This application demonstrates multi-user data synchronization using cloud services.</p>
+        </footer>
+    </div>
+
+    <!-- Firebase Configuration and Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, collection, query, // Removed orderBy import
+            addDoc, onSnapshot, setLogLevel
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Set Firebase Logging to debug for stability and connection tracing
+        setLogLevel('debug');
+
+        // --- GLOBAL ENVIRONMENT VARIABLES ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- FIREBASE INSTANCES & STATE ---
+        let db, auth;
+        let userId = null;
+
+        // --- DOM ELEMENTS ---
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const messageForm = document.getElementById('messageForm');
+        const userIdDisplay = document.getElementById('userIdDisplay');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const sendButton = document.getElementById('sendButton');
+
+        // --- FIREBASE INITIALIZATION AND AUTH ---
+
+        async function initializeFirebase() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Authenticate user
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                userId = auth.currentUser?.uid || crypto.randomUUID();
+                
+                userIdDisplay.textContent = `Your ID: ${userId}`;
+                
+                // Enable inputs/button now that we are connected
+                messageInput.disabled = false;
+                sendButton.disabled = false;
+
+                setupRealtimeListener();
+
+            } catch (error) {
+                console.error("Firebase Initialization Failed:", error);
+                userIdDisplay.textContent = "Error connecting to service.";
+                loadingIndicator.innerHTML = '<p class="text-red-500">Could not connect to chat. Please ensure the Firebase environment is set up correctly.</p>';
+            }
+        }
+
+        /**
+         * Returns the reference to the public chat collection.
+         */
+        function getMessageCollectionRef() {
+            if (!db) return null;
+            // Public data path: /artifacts/{appId}/public/data/messages
+            return collection(db, 'artifacts', appId, 'public', 'data', 'messages');
+        }
+
+        // --- CHAT LOGIC ---
+
+        /**
+         * Sets up the real-time Firestore listener (onSnapshot) for the public chat.
+         */
+        function setupRealtimeListener() {
+            const messagesRef = getMessageCollectionRef();
+            if (!messagesRef) return;
+            
+            // Query: Get all messages. Removed orderBy to avoid index requirement.
+            const q = query(messagesRef);
+            
+            onSnapshot(q, (snapshot) => {
+                // Remove loading indicator after first load
+                if (loadingIndicator) loadingIndicator.remove();
+                
+                let htmlContent = '';
+
+                // 1. Get all messages from the snapshot
+                const messages = snapshot.docs.map(doc => doc.data());
+
+                // 2. Sort DESCENDING (newest message first) by the createdAt timestamp in JavaScript
+                messages.sort((a, b) => b.createdAt - a.createdAt);
+
+                // 3. Reverse for rendering: Since the CSS uses flex-direction: column-reverse, 
+                // we must iterate oldest-to-newest to ensure the newest message is placed 
+                // visually at the bottom of the scroll container.
+                const docsToRender = messages.reverse();
+
+                docsToRender.forEach(message => {
+                    htmlContent += renderMessage(message);
+                });
+
+                // Set innerHTML once for performance
+                messagesContainer.innerHTML = htmlContent;
+                
+                // Keep the scroll position at the bottom (most recent message)
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            }, (error) => {
+                console.error("Firestore real-time listener failed:", error);
+                messagesContainer.innerHTML = '<p class="text-center text-red-500">Error loading chat history.</p>';
+            });
+        }
+
+        /**
+         * Renders a single message object into HTML.
+         */
+        function renderMessage(message) {
+            const isMe = message.userId === userId;
+            const messageClass = isMe ? 'ml-auto bg-indigo-500 text-white rounded-br-none' : 'mr-auto bg-gray-200 text-gray-800 rounded-tl-none';
+            const userTextClass = isMe ? 'text-indigo-200' : 'text-gray-500';
+            const time = message.createdAt ? new Date(message.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '';
+            
+            // Format the user ID to prevent text wrapping on long IDs
+            const displayUserId = message.userId;
+
+            return `
+                <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                    <div class="max-w-xs sm:max-w-md p-3 rounded-xl shadow-md ${messageClass}">
+                        <div class="text-xs font-semibold ${userTextClass} mb-1">${isMe ? 'You' : displayUserId}</div>
+                        <p class="text-sm break-words">${message.text}</p>
+                        <div class="text-right mt-1 text-xs ${isMe ? 'text-indigo-300' : 'text-gray-400'}">${time}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Sends a new message to Firestore.
+         */
+        async function sendMessage(text) {
+            if (!userId) return;
+            try {
+                // Disable button and input temporarily
+                messageInput.disabled = true;
+                sendButton.disabled = true;
+
+                await addDoc(getMessageCollectionRef(), {
+                    userId: userId,
+                    text: text.trim(),
+                    createdAt: Date.now()
+                });
+                
+                messageInput.value = ''; // Clear input on success
+                
+            } catch (e) {
+                console.error("Error sending message: ", e);
+            } finally {
+                // Re-enable button and input
+                messageInput.disabled = false;
+                sendButton.disabled = false;
+                messageInput.focus();
+            }
+        }
+
+        // --- EVENT LISTENERS ---
+
+        messageForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = messageInput.value.trim();
+            if (text && userId) {
+                sendMessage(text);
+            }
+        });
+
+        // Initialize Firebase on load
+        window.onload = initializeFirebase;
+    </script>
+</body>
+</html>
