@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merge PDF Pro | Storedropship Tools Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  *{box-sizing:border-box;font-family:'Inter',sans-serif}
+  body{
+    margin:0;
+    background:linear-gradient(135deg,#007acc,#00aaff);
+    color:#fff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    min-height:100vh;
+    text-align:center;
+  }
+  .tool-container{
+    background:rgba(255,255,255,0.12);
+    padding:2rem;
+    border-radius:20px;
+    backdrop-filter:blur(12px);
+    box-shadow:0 8px 25px rgba(0,0,0,0.15);
+    width:90%;
+    max-width:600px;
+  }
+  h1{font-size:1.6rem;margin-bottom:.5rem}
+  p{font-size:.95rem;margin-bottom:1.5rem}
+  input[type=file]{
+    margin:1rem 0;
+    padding:10px;
+    border-radius:10px;
+    background:#fff;
+    color:#333;
+    border:none;
+    width:100%;
+  }
+  button{
+    background:#fff;
+    color:#007acc;
+    border:none;
+    padding:10px 25px;
+    border-radius:8px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+    margin:10px 5px;
+  }
+  button:hover{background:#007acc;color:#fff}
+  #fileList{
+    text-align:left;
+    background:rgba(255,255,255,0.1);
+    border-radius:10px;
+    padding:10px;
+    max-height:150px;
+    overflow:auto;
+    margin-top:10px;
+    font-size:0.9rem;
+  }
+  footer{margin-top:2rem;font-size:.85rem;color:rgba(255,255,255,.85)}
+  footer a{color:#fff;text-decoration:none;font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="tool-container">
+  <h1>Merge PDF Pro</h1>
+  <p>Combine multiple PDF files into one. Preview, rename, and download all results as ZIP.</p>
+
+  <input type="file" id="pdfFiles" accept="application/pdf" multiple>
+  <button onclick="showFiles()">Preview Files</button>
+  <button onclick="mergePDFs()">Merge PDFs</button>
+  <button id="zipBtn" style="display:none;" onclick="downloadZIP()">Download All as ZIP</button>
+
+  <div id="fileList"></div>
+</div>
+
+<footer>
+  Made with ❤️ by <a href="https://storedropship.in/" target="_blank">Sheetal Sahu</a> |
+  <a href="https://hostinger.in?REFERRALCODE=UOHSTOREDR07" target="_blank">Host on Hostinger</a>
+</footer>
+
+<script>
+let mergedBlob = null;
+let selectedFiles = [];
+let zip = new JSZip();
+
+function showFiles(){
+  const input=document.getElementById('pdfFiles');
+  const list=document.getElementById('fileList');
+  selectedFiles=[...input.files];
+  list.innerHTML='';
+  if(selectedFiles.length===0){alert("Please choose PDF files first.");return;}
+  selectedFiles.forEach((file,i)=>{
+    const item=document.createElement('div');
+    item.innerHTML=`📄 <b>${file.name}</b> (${(file.size/1024).toFixed(1)} KB)
+    <br><input type="text" id="rename${i}" placeholder="Rename (optional)" style="width:90%;margin-top:4px;border-radius:5px;border:none;padding:4px;">`;
+    list.appendChild(item);
+  });
+}
+
+async function mergePDFs(){
+  if(selectedFiles.length===0){alert("Please select some PDFs first.");return;}
+  const pdfDoc=await PDFLib.PDFDocument.create();
+
+  for(let i=0;i<selectedFiles.length;i++){
+    const file=selectedFiles[i];
+    const arrayBuffer=await file.arrayBuffer();
+    const loadedPDF=await PDFLib.PDFDocument.load(arrayBuffer);
+    const copiedPages=await pdfDoc.copyPages(loadedPDF,loadedPDF.getPageIndices());
+    copiedPages.forEach(p=>pdfDoc.addPage(p));
+    const blob=new Blob([arrayBuffer],{type:'application/pdf'});
+    const rename=document.getElementById(`rename${i}`).value||file.name;
+    zip.file(rename.endsWith('.pdf')?rename:`${rename}.pdf`,blob);
+  }
+
+  const mergedPdfBytes=await pdfDoc.save();
+  mergedBlob=new Blob([mergedPdfBytes],{type:'application/pdf'});
+  zip.file('merged_storedropship.pdf',mergedBlob);
+  const list=document.getElementById('fileList');
+  list.innerHTML+="<br>✅ Merging complete. Click below to download ZIP.";
+  document.getElementById('zipBtn').style.display='inline-block';
+}
+
+async function downloadZIP(){
+  if(!mergedBlob){alert("Please merge files first.");return;}
+  const zipBlob=await zip.generateAsync({type:'blob'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(zipBlob);
+  a.download='storedropship-merged-pdfs.zip';
+  a.click();
+}
+</script>
+
+</body>
+</html>
